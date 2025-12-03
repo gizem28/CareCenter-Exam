@@ -80,6 +80,12 @@
 }
 
 /* Minimal Table Overrides */
+.appointments-table {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 .appointments-table thead {
   background: var(--bs-primary);
 }
@@ -272,4 +278,65 @@
   font-size: 1.05rem !important;
   padding: 0.625rem 1rem !important;
   font-weight: 500 !important;
+}
+
+/* Light Teal Button */
+.btn-light-teal {
+  background-color: #4db6ac;
+  border-color: #4db6ac;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.btn-light-teal:hover:not(:disabled) {
+  background-color: #26a69a;
+  border-color: #26a69a;
+  color: white;
+}
+
+.btn-light-teal:active:not(:disabled),
+.btn-light-teal:focus:not(:disabled) {
+  background-color: #00897b;
+  border-color: #00897b;
+  color: white;
+  box-shadow: 0 0 0 0.2rem rgba(77, 182, 172, 0.25);
+}
+
+.btn-light-teal:disabled {
+  background-color: #4db6ac;
+  border-color: #4db6ac;
+  opacity: 0.6;
+  color: white;
+}
+
+/* Outline Teal Button */
+.btn-outline-teal {
+  background-color: transparent;
+  border: 1px solid #00897b;
+  color: #00897b;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-teal:hover:not(:disabled),
+.btn-outline-teal:active:not(:disabled),
+.btn-outline-teal:focus:not(:disabled) {
+  background-color: #4db6ac;
+  border-color: #4db6ac;
+  color: white;
+  box-shadow: 0 0 0 0.2rem rgba(77, 182, 172, 0.15);
+}
+
+.btn-outline-teal:disabled {
+  border-color: #00897b;
+  color: #00897b;
+  opacity: 0.4;
+  background-color: transparent;
+}
+
+.btn-outline-teal i {
+  margin-right: 0.25rem;
+}
+
+.btn-outline-teal span {
+  margin-left: 0.25rem;
 }

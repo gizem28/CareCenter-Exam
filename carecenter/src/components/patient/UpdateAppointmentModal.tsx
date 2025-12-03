@@ -5,7 +5,7 @@ import {
   availabilityRequests,
   type AvailabilityDTO,
 } from "../../api/availabilities";
-import type { ServiceType } from "../patient/PatientCalendarForm";
+import type { ServiceType } from "./PatientCalendarForm";
 
 interface UpdateAppointmentModalProps {
   isOpen: boolean;
@@ -689,3 +689,4 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
 };
 
 export default UpdateAppointmentModal;
+

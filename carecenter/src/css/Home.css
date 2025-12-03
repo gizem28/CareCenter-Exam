@@ -75,16 +75,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Footer Styles */
-footer {
-  margin-top: auto;
-  background-color: white;
-}
-
-footer .border-top {
-  border-top: 1px solid #dee2e6 !important;
-}
-
 /* Logout button styles */
 .navbar-custom .btn-outline-light {
   border-color: rgba(255, 255, 255, 0.5);

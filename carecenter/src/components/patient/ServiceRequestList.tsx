@@ -272,7 +272,7 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
                     <td>
                       <div className="d-flex gap-2">
                         <Button
-                          variant="outline-primary"
+                          className="btn-outline-teal"
                           size="sm"
                           onClick={() => handleUpdateClick(appointment)}
                           disabled={
@@ -348,3 +348,4 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
 };
 
 export default ServiceRequestList;
+

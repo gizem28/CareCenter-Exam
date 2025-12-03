@@ -257,7 +257,10 @@ const PatientCalendarForm: React.FC<PatientCalendarFormProps> = ({
 
   return (
     <div className="bg-white rounded p-3 shadow-sm patient-calendar-form">
-      <h2 className="h4 text-primary fw-bold mb-3">Create Service Request</h2>
+      <h2 className="h4 text-primary fw-bold mb-2">Create Service Request</h2>
+      <p className="text-muted small mb-3">
+        Please select the service you need from below and choose an available date and time.
+      </p>
 
       <Form onSubmit={handleSubmit}>
         {/* Service Type Selection */}
@@ -452,8 +455,7 @@ const PatientCalendarForm: React.FC<PatientCalendarFormProps> = ({
         <div className="d-flex gap-3 mt-4">
           <Button
             type="submit"
-            variant="primary"
-            className="flex-fill"
+            className="btn-light-teal flex-fill"
             disabled={loading || loadingDates || submittingRef.current}
           >
             {loading ? (
