@@ -1,4 +1,4 @@
-import { apiService } from "../services/apiService";
+import { apiService } from "./apiService";
 
 // Appointment types - matches backend Appointment model
 export interface AppointmentDTO {

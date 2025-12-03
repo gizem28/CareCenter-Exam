@@ -1,4 +1,4 @@
-import apiClient from "./apiClient";
+import { apiService } from "./apiService";
 
 export interface PatientRegisterData {
   fullName: string;
@@ -12,43 +12,63 @@ export interface PatientRegisterData {
 export const AuthService = {
   login: async (email: string, password: string) => {
     try {
-      const response = await apiClient.post("/Auth/login", { email, password });
-      return response.data; // eks: { token: "JWT..." }
+      const response = await apiService.post<{
+        token: string;
+        role: string;
+        email: string;
+        fullName: string;
+      }>("/Auth/login", { email, password });
+      return response; // apiService zaten parse ediyor, response.data gerekmez
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Login failed");
+      // apiService'in error formatı farklı olabilir
+      const errorMessage =
+        error?.message || error?.response?.data?.message || "Login failed";
+      throw new Error(errorMessage);
     }
   },
 
   registerPatient: async (data: PatientRegisterData) => {
     try {
-      const response = await apiClient.post("/Auth/register-patient", data);
-      return response.data;
+      const response = await apiService.post("/Auth/register-patient", data);
+      return response;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Registration failed");
+      const errorMessage =
+        error?.message ||
+        error?.response?.data?.message ||
+        "Registration failed";
+      throw new Error(errorMessage);
     }
   },
 
   forgotPassword: async (email: string) => {
     try {
-      const response = await apiClient.post("/Auth/forgot-password", { email });
-      return response.data;
+      const response = await apiService.post("/Auth/forgot-password", {
+        email,
+      });
+      return response;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || "Failed to process request"
-      );
+      const errorMessage =
+        error?.message ||
+        error?.response?.data?.message ||
+        "Failed to process request";
+      throw new Error(errorMessage);
     }
   },
 
   resetPassword: async (email: string, token: string, newPassword: string) => {
     try {
-      const response = await apiClient.post("/Auth/reset-password", {
+      const response = await apiService.post("/Auth/reset-password", {
         email,
         token,
         newPassword,
       });
-      return response.data;
+      return response;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Password reset failed");
+      const errorMessage =
+        error?.message ||
+        error?.response?.data?.message ||
+        "Password reset failed";
+      throw new Error(errorMessage);
     }
   },
 };

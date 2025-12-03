@@ -5,8 +5,7 @@ import React, {
   useEffect,
   type ReactNode,
 } from "react";
-import { apiService } from "../services/apiService";
-
+import { AuthService } from "../api/authService";
 interface User {
   email: string;
   fullName: string;
@@ -72,12 +71,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Login function - calls API and stores token
   const login = async (email: string, password: string): Promise<void> => {
     try {
-      const response = await apiService.post<{
-        token: string;
-        role: string;
-        email: string;
-        fullName: string;
-      }>("/auth/login", { email, password });
+      const response = await AuthService.login(email, password);
 
       const userData: User = {
         email: response.email,
@@ -94,7 +88,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Logout function - clear token and user data
+  // Login out is easy we just clear the token adn user data from local storage
   const logout = () => {
     setToken(null);
     setUser(null);

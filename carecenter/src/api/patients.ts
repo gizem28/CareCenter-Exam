@@ -1,4 +1,4 @@
-import { apiService } from "../services/apiService";
+import { apiService } from "./apiService";
 
 // Patient types matching backend DTOs
 export interface PatientDTO {
@@ -39,14 +39,6 @@ export const patientRequests = {
     return apiService.get<PatientDTO>(
       `/patients/email/${encodeURIComponent(email)}`
     );
-  },
-
-  /**
-   * Create a new patient
-   * POST /api/patients
-   */
-  create: async (patient: Omit<PatientDTO, "id">): Promise<PatientDTO> => {
-    return apiService.post<PatientDTO>("/patients", patient);
   },
 
   /**

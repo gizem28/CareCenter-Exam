@@ -1,4 +1,4 @@
-import { apiService } from "../services/apiService";
+import { apiService } from "./apiService";
 
 // Healthcare Worker types matching backend DTOs
 export interface HealthcareWorkerDTO {

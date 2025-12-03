@@ -1,4 +1,4 @@
-import { apiService } from "../services/apiService";
+import { apiService } from "./apiService";
 
 // Availability types matching backend DTOs
 export interface AvailabilityDTO {

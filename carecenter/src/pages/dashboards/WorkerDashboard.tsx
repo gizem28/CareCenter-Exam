@@ -3,7 +3,7 @@ import { Alert } from "react-bootstrap";
 import { useAuth } from "../../contexts/AuthContext";
 import type { AvailabilityDTO } from "../../api/availabilities";
 import type { AppointmentDTO } from "../../api/appointments";
-import { apiService } from "../../services/apiService";
+import { apiService } from "../../api/apiService";
 import { healthcareWorkerRequests } from "../../api/healthcareWorkers";
 import { patientRequests } from "../../api/patients";
 import type { PatientDTO } from "../../api/patients";
