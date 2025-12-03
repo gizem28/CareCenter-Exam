@@ -4,7 +4,6 @@ import type { AvailabilityDTO } from "../../api/availabilities";
 import type { AppointmentDTO } from "../../api/appointments";
 import { patientRequests } from "../../api/patients";
 import type { PatientDTO } from "../../api/patients";
-import ConfirmationModal from "../shared/ConfirmationModal";
 
 interface AvailabilityModalProps {
   availability: AvailabilityDTO;
@@ -41,7 +40,6 @@ const AvailabilityModal: React.FC<AvailabilityModalProps> = ({
   formatTime,
   isFutureDate,
 }) => {
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [patientInfo, setPatientInfo] = useState<PatientDTO | null>(null);
   const [loadingPatient, setLoadingPatient] = useState(false);
 
@@ -65,12 +63,7 @@ const AvailabilityModal: React.FC<AvailabilityModalProps> = ({
   }, [appointment?.patientId]);
 
   const handleDeleteClick = () => {
-    setShowDeleteConfirm(true);
-  };
-
-  const handleConfirmDelete = () => {
     onDelete(availability.id);
-    setShowDeleteConfirm(false);
     onClose();
   };
   const getStatusBadgeVariant = (status?: string) => {
@@ -234,18 +227,6 @@ const AvailabilityModal: React.FC<AvailabilityModalProps> = ({
           </Button>
         </Modal.Footer>
       </Modal>
-
-      {/* Delete Confirmation Modal */}
-      <ConfirmationModal
-        isOpen={showDeleteConfirm}
-        title="Delete Availability"
-        message="Are you sure you want to delete this availability? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
-        variant="danger"
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setShowDeleteConfirm(false)}
-      />
     </>
   );
 };
