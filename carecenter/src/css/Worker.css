@@ -1,0 +1,165 @@
+/* ============================================
+   Worker Dashboard Styles
+   ============================================ */
+
+/* Modal styles for availability forms and details */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1051;
+}
+
+.availability-modal {
+  max-width: 700px;
+}
+
+/* Custom layout for worker-specific functionality */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  width: 100%;
+  justify-items: center;
+}
+
+.selected-date-display {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--bs-light);
+  color: var(--bs-primary);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.table-container {
+  overflow-x: auto;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.info-section {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--bs-light);
+  border-radius: 6px;
+}
+
+.info-section h3 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.info-section div {
+  margin-bottom: 0.5rem;
+}
+
+.info-section ul {
+  margin-top: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+/* Modal info section styling */
+.info-section {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.info-section h3 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.info-section div {
+  margin-bottom: 0.5rem;
+}
+
+/* Date input styling for better calendar visibility */
+.date-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.date-input {
+  padding-right: 40px !important;
+  cursor: pointer;
+}
+
+.date-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  pointer-events: none;
+  font-size: 1.1rem;
+}
+
+.date-input-container:hover .date-icon {
+  color: var(--bs-primary);
+}
+
+/* Ensure date picker appears on all browsers */
+input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+}
+
+input[type="date"]:focus::-webkit-calendar-picker-indicator {
+  background: transparent;
+}
+
+/* Worker Dashboard spacing */
+.worker-dashboard-container {
+  min-height: 100vh; /* Ensure minimum height for footer spacing */
+}

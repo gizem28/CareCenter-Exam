@@ -1,0 +1,76 @@
+/* Login page styles - simplified */
+.section {
+  padding: 3rem 0;
+}
+
+/* Date input styling for better calendar visibility */
+.date-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.date-input {
+  padding-right: 40px !important;
+  cursor: pointer;
+}
+
+.date-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  pointer-events: auto;
+  font-size: 1.1rem;
+  z-index: 3;
+}
+
+.date-input-container:hover .date-icon {
+  color: #00897b;
+}
+
+/* Date input styling - make calendar picker visible for login/signup forms */
+input[type="date"].form-control {
+  cursor: pointer;
+}
+
+/* Ensure date picker indicator is visible in webkit browsers for login/signup */
+input[type="date"].form-control::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 1;
+  position: relative;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  color: #6c757d;
+}
+
+/* Override Worker.css rules for login/signup forms - ensure native date picker works */
+.section input[type="date"].form-control {
+  -webkit-appearance: textfield !important;
+  appearance: auto !important;
+  -moz-appearance: textfield !important;
+}
+
+.section input[type="date"].form-control::-webkit-calendar-picker-indicator {
+  opacity: 1 !important;
+  background: transparent !important;
+  bottom: auto !important;
+  color: #6c757d !important;
+  cursor: pointer !important;
+  height: 20px !important;
+  left: auto !important;
+  position: absolute !important;
+  right: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 20px !important;
+  z-index: 1 !important;
+}
+
+/* Ensure the date input container allows clicks through to the input */
+.section .date-input-container input[type="date"] {
+  position: relative;
+  z-index: 2;
+}

@@ -1,0 +1,98 @@
+.availability-calendar {
+  width: 100%;
+  border: none;
+  font-family: inherit;
+  background: transparent;
+}
+
+.availability-calendar .react-calendar__tile {
+  color: #1f2937;
+  background: #ffffff;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.availability-calendar .react-calendar__tile--active {
+  background: #e0f2f2;
+  color: #004d40;
+  font-weight: 600;
+}
+
+.availability-calendar .react-calendar__tile--now {
+  background: #e3f2fd;
+  color: #0277bd;
+  font-weight: 600;
+}
+
+.available-date {
+  background: #d1fae5 !important;
+  color: #065f46 !important;
+  font-weight: 600 !important;
+}
+
+.booked-date {
+  background: #fde68a !important;
+  color: #92400e !important;
+  font-weight: 600 !important;
+}
+
+.approved-appointment-date {
+  background: #bfdbfe !important;
+  color: #1e40af !important;
+  font-weight: 600 !important;
+}
+
+.selected-date {
+  background: #fde68a !important;
+  color: #92400e !important;
+  font-weight: 700 !important;
+  border: 2px solid #f59e0b !important;
+}
+
+.react-calendar__navigation {
+  margin-bottom: 1rem;
+}
+
+.react-calendar__navigation button {
+  color: #00897b;
+  font-weight: 600;
+}
+
+.react-calendar__navigation__label {
+  font-weight: 700;
+  color: #00695c;
+}
+
+.react-calendar__month-view__weekdays {
+  font-weight: 700;
+  color: #00897b;
+  margin-bottom: 0.5rem;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  color: #00897b;
+}
+
+/* Weekend weekday labels (Saturday and Sunday) */
+.availability-calendar
+  .react-calendar__month-view__weekdays__weekday:nth-child(6),
+.availability-calendar
+  .react-calendar__month-view__weekdays__weekday:nth-child(7) {
+  color: #dc3545;
+}
+
+.react-calendar__tile--neighboringMonth {
+  opacity: 0.5;
+}
+
+.react-calendar__tile--disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Weekend days (Saturday and Sunday) */
+.availability-calendar .react-calendar__month-view__days__day--weekend {
+  color: #7b1717 !important;
+  font-weight: 900;
+}

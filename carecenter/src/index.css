@@ -1,0 +1,121 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: #213547;
+  background-color: #ffffff;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Teal Color Palette - Base: #20c997 */
+  --teal-100: #d1f2e8;
+  --teal-200: #a3e5d1;
+  --teal-300: #75d8ba;
+  --teal-400: #47cba3;
+  --teal-500: #3ab88a;
+  --teal-600: #20c997;
+  --teal-700: #1ba085;
+  --teal-800: #157773;
+  --teal-900: #0f4e61;
+
+  /* Green Color Palette - Base: #198754 */
+  --green-100: #d1e7dd;
+  --green-200: #a3cfbb;
+  --green-300: #75b799;
+  --green-400: #479f77;
+  --green-500: #2d8659;
+  --green-600: #198754;
+  --green-700: #146c43;
+  --green-800: #0f5132;
+  --green-900: #0a3622;
+
+  /* Primary colors for healthcare theme */
+  --primary: var(--teal-600);
+  --primary-hover: var(--teal-700);
+  --primary-light: var(--teal-100);
+  --secondary: var(--green-600);
+  --secondary-hover: var(--green-700);
+}
+
+a {
+  font-weight: 500;
+  color: var(--primary);
+  text-decoration: inherit;
+}
+a:hover {
+  color: var(--primary-hover);
+}
+
+html {
+  background-color: #ffffff;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  background-color: #ffffff;
+}
+
+#root {
+  background-color: #ffffff;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: var(--primary);
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  html {
+    background-color: #ffffff;
+  }
+  body {
+    background-color: #ffffff;
+  }
+  #root {
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: var(--primary-hover);
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}

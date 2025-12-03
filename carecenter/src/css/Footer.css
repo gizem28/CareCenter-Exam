@@ -1,0 +1,57 @@
+/* ============================================
+   Footer Styles
+   ============================================ */
+
+/* Login page footer - match content width */
+footer.login-footer .container {
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+/* Enhanced footer styles */
+footer {
+  margin-top: auto;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+footer a:hover {
+  color: #007bff !important;
+  transition: color 0.2s ease;
+}
+
+footer .fw-bold {
+  color: #2c3e50;
+}
+
+footer .text-primary {
+  color: #007bff !important;
+}
+
+footer hr {
+  border-color: rgba(0, 0, 0, 0.1);
+  margin: 1.5rem 0;
+}
+
+footer .bi {
+  font-size: 1.1em;
+}
+
+/* Footer responsiveness */
+@media (max-width: 768px) {
+  footer .col-lg-4 {
+    margin-bottom: 2rem;
+  }
+
+  footer .row.align-items-center {
+    text-align: center !important;
+  }
+
+  footer .col-md-6 {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Security notice styling */
+footer .bi-shield-check {
+  color: #28a745;
+}

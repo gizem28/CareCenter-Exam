@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "react-bootstrap": "^2.10.10",
+    "react-calendar": "^6.0.0",
+    "react-router-dom": "^7.9.5"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "wait-on": "^9.0.3"
+  }
+}

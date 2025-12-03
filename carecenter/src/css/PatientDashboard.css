@@ -1,0 +1,275 @@
+/* ============================================
+   Patient Dashboard Styles
+   ============================================ */
+
+/* Bootstrap Variable Overrides */
+:root {
+  --bs-primary: #00897b;
+  --bs-primary-rgb: 0, 137, 123;
+}
+
+/* Custom height utility */
+.min-vh-custom {
+  min-height: calc(100vh - 76px);
+}
+
+/* Custom Layout (CSS Grid not available in Bootstrap utilities) */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 450px 1fr;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Service Type Buttons Grid */
+.service-type-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 0.75rem 0;
+}
+
+/* Custom Button Styles (minimal overrides) */
+.service-type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0.75rem;
+  border: 2px solid var(--bs-border-color);
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--bs-primary);
+  min-height: 80px;
+  text-decoration: none;
+}
+
+.service-type-btn:hover:not(:disabled),
+.service-type-btn.active {
+  border-color: var(--bs-primary);
+  background: var(--bs-primary);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.service-type-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.service-type-btn i {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Form Controls */
+.form-control-large {
+  font-size: 1.1rem;
+  padding: 0.875rem 1rem;
+}
+
+.form-control-large:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Minimal Table Overrides */
+.appointments-table thead {
+  background: var(--bs-primary);
+}
+
+.appointments-table tbody tr:hover {
+  background: var(--bs-light);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.text-teal {
+  color: var(--bs-primary) !important;
+}
+
+/* Minimal Modal Overrides */
+.modal-header-teal {
+  background: var(--bs-primary);
+  color: white;
+}
+
+.modal-header-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.alert {
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin: 0 auto 2rem;
+  max-width: 1400px;
+}
+
+.alert-danger {
+  background: #f8d7da;
+  color: #842029;
+  border: 1px solid #f5c2c7;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .service-type-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-content {
+    max-width: 100%;
+    margin: 0.5rem;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+  }
+
+  .btn-modal {
+    width: 100%;
+  }
+}
+
+/* Success Messages */
+.success-message-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1050;
+  min-width: 300px;
+  max-width: 400px;
+  animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .success-message-container {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    min-width: auto;
+    max-width: none;
+  }
+}
+
+.update-appointment-modal .mb-4 {
+  margin-bottom: 1rem !important;
+}
+
+.update-appointment-modal .mb-3 {
+  margin-bottom: 0.75rem !important;
+}
+
+.update-appointment-modal .service-type-section {
+  margin-bottom: 1rem !important;
+}
+
+.update-appointment-modal .form-label {
+  margin-bottom: 0.5rem !important;
+}
+
+.update-appointment-modal .service-type-btn {
+  min-height: 3rem !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 1rem !important;
+  height: 100px !important;
+  width: 200px !important;
+  margin: 0.125rem !important;
+}
+
+.update-appointment-modal .service-type-btn i {
+  font-size: 1.125rem !important;
+  margin-bottom: 0.125rem !important;
+}
+
+.modal-dialog {
+  max-width: 450px;
+}
+
+/* Increase font sizes for Patient Dashboard appointments table */
+.appointments-table {
+  font-size: 1.1rem !important;
+}
+
+.appointments-table th {
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+  padding: 1rem 0.75rem !important;
+}
+
+.appointments-table td {
+  font-size: 1.1rem !important;
+  padding: 0.875rem 0.75rem !important;
+  vertical-align: middle !important;
+}
+
+.appointments-table .btn {
+  font-size: 1rem !important;
+  padding: 0.5rem 0.75rem !important;
+}
+
+/* Increase font sizes for Patient Dashboard service request form */
+.patient-calendar-form {
+  font-size: 1.05rem !important;
+}
+
+.patient-calendar-form h2 {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+}
+
+.patient-calendar-form .form-label {
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.patient-calendar-form .form-select,
+.patient-calendar-form .form-control {
+  font-size: 1.05rem !important;
+  padding: 0.625rem 0.75rem !important;
+}
+
+.patient-calendar-form .btn {
+  font-size: 1.05rem !important;
+  padding: 0.625rem 1rem !important;
+  font-weight: 500 !important;
+}

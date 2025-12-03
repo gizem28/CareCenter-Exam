@@ -1,0 +1,75 @@
+.navbar-custom {
+  background-color: #00796b !important; /* Dark teal matching the design */
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* Ensure navbar stays on top */
+}
+
+.navbar-custom .navbar-brand {
+  color: white !important;
+  font-weight: 600;
+}
+
+.navbar-custom .nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  transition: color 0.2s ease;
+}
+
+.navbar-custom .nav-link:hover {
+  color: white !important;
+}
+
+.navbar-custom .nav-link.active-link {
+  color: white !important;
+  text-decoration: underline;
+}
+
+/* Section Styles */
+.section {
+  padding: 1rem 0;
+}
+
+.section-muted {
+  background-color: #ecf8f5;
+}
+
+/* Text Styles */
+.text-teal {
+  color: #009688 !important;
+}
+
+/* Button Styles */
+.navbar-custom .btn-outline-light {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.navbar-custom .btn-outline-light:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.8);
+  color: white;
+}
+
+.navbar-custom .navbar-text {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 991px) {
+  .navbar-collapse .ms-auto {
+    margin-left: 0 !important;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .navbar-collapse .d-flex {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .navbar-collapse .navbar-text {
+    margin-bottom: 0.5rem;
+  }
+}
