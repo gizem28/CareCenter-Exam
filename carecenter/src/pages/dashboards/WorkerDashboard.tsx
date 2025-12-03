@@ -670,9 +670,6 @@ const WorkerDashboard: React.FC = () => {
       {selectedCalendarAvailability && (
         <AvailabilityModal
           availability={selectedCalendarAvailability}
-          appointment={getAppointmentForAvailability(
-            selectedCalendarAvailability
-          )}
           onClose={() => setSelectedCalendarAvailability(null)}
           onEdit={handleEditAvailability}
           onDelete={handleDeleteAvailability}
