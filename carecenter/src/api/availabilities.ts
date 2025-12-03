@@ -35,25 +35,32 @@ export const availabilityRequests = {
   },
 
   /**
-   * Add availability dates for a healthcare worker
-   * POST /api/availabilities
-   * Note: This method is deprecated - use direct apiService.post with array of DTOs
+   * Get availabilities by healthcare worker ID
+   * GET /api/Availabilities/worker/{workerId}
    */
-  add: async (
-    healthcareWorkerId: number,
-    dates: string[],
-    startTime?: string,
-    endTime?: string
-  ): Promise<{ message: string; createdList: AvailabilityDTO[] }> => {
-    return apiService.post<{ message: string; createdList: AvailabilityDTO[] }>(
-      "/Availabilities",
-      {
-        healthcareWorkerId,
-        dates,
-        startTime,
-        endTime,
-      }
+  getByWorker: async (workerId: number): Promise<AvailabilityDTO[]> => {
+    return apiService.get<AvailabilityDTO[]>(
+      `/Availabilities/worker/${workerId}`
     );
+  },
+
+  /**
+   * Create multiple availabilities from an array of DTOs
+   * POST /api/Availabilities
+   * Accepts an array of AvailabilityDTO objects
+   */
+  createBatch: async (
+    availabilities: Partial<AvailabilityDTO>[]
+  ): Promise<{
+    message: string;
+    created?: AvailabilityDTO[];
+    errors?: Array<{ date?: string; error: string }> | null;
+  }> => {
+    return apiService.post<{
+      message: string;
+      created?: AvailabilityDTO[];
+      errors?: Array<{ date?: string; error: string }> | null;
+    }>("/Availabilities", availabilities);
   },
 
   /**

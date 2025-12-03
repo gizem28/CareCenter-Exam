@@ -3,7 +3,8 @@ import { Alert } from "react-bootstrap";
 import { useAuth } from "../../contexts/AuthContext";
 import type { AvailabilityDTO } from "../../api/availabilities";
 import type { AppointmentDTO } from "../../api/appointments";
-import { apiService } from "../../api/apiService";
+import { availabilityRequests } from "../../api/availabilities";
+import { appointmentRequests } from "../../api/appointments";
 import { healthcareWorkerRequests } from "../../api/healthcareWorkers";
 import { patientRequests } from "../../api/patients";
 import type { PatientDTO } from "../../api/patients";
@@ -97,9 +98,7 @@ const WorkerDashboard: React.FC = () => {
 
   const loadAvailabilities = async (id: number) => {
     try {
-      const workerAvailabilities = await apiService.get<AvailabilityDTO[]>(
-        `/availabilities/worker/${id}`
-      );
+      const workerAvailabilities = await availabilityRequests.getByWorker(id);
       setAvailabilities(workerAvailabilities);
     } catch (err: any) {
       console.error("Failed to load availabilities:", err);
@@ -108,28 +107,18 @@ const WorkerDashboard: React.FC = () => {
 
   const loadAppointments = async (id: number) => {
     try {
-      const data = await apiService.get<any[]>(`/appointments/worker/${id}`);
+      const data = await appointmentRequests.getByWorker(id);
       const mappedAppointments: (AppointmentDTO & {
         tasks?: Array<{ description: string; done: boolean }>;
       })[] = data.map((item) => ({
-        id: item.id,
-        patientId: item.patientId,
+        ...item,
         workerId: id,
-        workerName: item.workerName,
-        appointmentDate: item.date,
+        appointmentDate: item.date || item.appointmentDate,
         appointmentTime:
-          item.startTime ||
           item.selectedStartTime ||
           item.availability?.startTime ||
+          item.appointmentTime ||
           "", // Use the time from API response
-        selectedStartTime: item.selectedStartTime,
-        selectedEndTime: item.selectedEndTime,
-        status: item.status,
-        notes: item.visitNote,
-        serviceType: "",
-        availabilityId: item.availability?.id,
-        availability: item.availability,
-        tasks: item.tasks,
       }));
       setAppointments(mappedAppointments);
     } catch (err: any) {
@@ -223,16 +212,16 @@ const WorkerDashboard: React.FC = () => {
       }
 
       const availabilities = dates.map((date) => {
-        const payload: any = { healthcareWorkerId: workerId, date: date };
+        const payload: Partial<AvailabilityDTO> = {
+          healthcareWorkerId: workerId,
+          date: date,
+        };
         if (startTime) payload.startTime = convertTimeToTimeSpan(startTime);
         if (endTime) payload.endTime = convertTimeToTimeSpan(endTime);
         return payload;
       });
 
-      const response = await apiService.post<any>(
-        "/availabilities",
-        availabilities
-      );
+      const response = await availabilityRequests.createBatch(availabilities);
       if (response.errors && response.errors.length > 0) {
         const errorMsg = response.errors
           .map(
@@ -304,10 +293,7 @@ const WorkerDashboard: React.FC = () => {
         updateData.endTime = null;
       }
 
-      await apiService.put(
-        `/availabilities/${editingAvailability.id}`,
-        updateData
-      );
+      await availabilityRequests.update(editingAvailability.id, updateData);
       await loadAvailabilities(workerId);
       resetForm();
       setEditingAvailability(null);
@@ -324,9 +310,7 @@ const WorkerDashboard: React.FC = () => {
   const confirmDeleteAvailability = async () => {
     if (!deleteConfirmation.availabilityId) return;
     try {
-      await apiService.delete(
-        `/availabilities/${deleteConfirmation.availabilityId}`
-      );
+      await availabilityRequests.delete(deleteConfirmation.availabilityId);
       if (workerId) {
         await loadAvailabilities(workerId);
       }

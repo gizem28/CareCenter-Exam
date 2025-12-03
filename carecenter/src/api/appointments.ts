@@ -90,6 +90,14 @@ export const appointmentRequests = {
   },
 
   /**
+   * Get appointments by healthcare worker ID
+   * GET /api/Appointments/worker/{workerId}
+   */
+  getByWorker: async (workerId: number): Promise<AppointmentDTO[]> => {
+    return apiService.get<AppointmentDTO[]>(`/Appointments/worker/${workerId}`);
+  },
+
+  /**
    * Create a new appointment
    * POST /api/Appointments
    */
