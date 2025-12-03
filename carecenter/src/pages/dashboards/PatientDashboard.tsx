@@ -11,7 +11,7 @@ import { patientRequests } from "../../api/patients";
 import PatientCalendarForm, {
   type ServiceType,
 } from "../../components/patient/PatientCalendarForm";
-import ServiceRequestList from "../../components/forms/ServiceRequestList";
+import ServiceRequestList from "../../components/patient/ServiceRequestList";
 
 // Main dashboard for patients - shows appointments and booking form
 const PatientDashboard: React.FC = () => {

@@ -83,10 +83,10 @@ const Home: React.FC = () => {
               {/* Hero image (illustration of healthcare service) */}
               <div className="col-lg-6 text-center">
                 <img
-                  src="/images/hero.png"
+                  src="/images/hero.webp"
                   alt="Nurse supporting an elderly patient"
                   className="img-fluid rounded-3 shadow-sm"
-                  style={{ maxWidth: "85%", height: "auto" }}
+                  style={{ maxWidth: "100%", height: "auto" }}
                   onError={(e) => {
                     // Fallback if image doesn't exist
                     e.currentTarget.style.display = "none";
