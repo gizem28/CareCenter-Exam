@@ -472,18 +472,18 @@ const WorkerDashboard: React.FC = () => {
 
   const handleCalendarDateClick = (value: Date) => {
     const availability = getAvailabilityForDate(value);
-    if (availability) {
+    if (availability && availability.isBooked) {
+      // For booked dates, show appointment details
+      const appointment = getAppointmentForAvailability(availability);
+      if (appointment) {
+        handleViewAppointment(appointment);
+      }
+    } else if (availability) {
+      // For available dates, show availability details
       setSelectedCalendarAvailability(availability);
     } else {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const clickedDate = new Date(value);
-      clickedDate.setHours(0, 0, 0, 0);
-      if (clickedDate >= today) {
-        setSelectedCalendarAvailability(null);
-      } else {
-        setSelectedCalendarAvailability(null);
-      }
+      // No availability for this date
+      setSelectedCalendarAvailability(null);
     }
   };
 
@@ -637,9 +637,11 @@ const WorkerDashboard: React.FC = () => {
                 availabilities={availabilities}
                 onEdit={handleEditAvailability}
                 onDelete={handleDeleteAvailability}
+                onViewAppointment={handleViewAppointment}
                 formatDate={formatDate}
                 formatTime={formatTime}
                 isFutureDate={isFutureDate}
+                getAppointmentForAvailability={getAppointmentForAvailability}
               />
             )}
           </section>
