@@ -132,7 +132,7 @@ public async Task<IActionResult> GetByPatient(int patientId)
                 var appointments = await _repo.GetByWorkerAsync(workerId);
 
                 if (!appointments.Any())
-                    return NotFound(new { message = "No appointments found for this worker." });
+                        return Ok(new List<object>());
 
             
                 string? FormatTimeSpan(TimeSpan? ts)
