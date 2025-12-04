@@ -20,9 +20,6 @@ interface ServiceRequestWithPatient extends AppointmentDTO {
   workerName?: string;
   workerEmail?: string;
   startTime?: string;
-  endTime?: string;
-  selectedStartTime?: string;
-  selectedEndTime?: string;
 }
 
 const ServiceRequestsApproval: React.FC = () => {
@@ -62,29 +59,20 @@ const ServiceRequestsApproval: React.FC = () => {
             }
           }
 
-          // Extract selected times (patient's chosen time) or fall back to availability times
-          // Backend returns PascalCase: SelectedStartTime, SelectedEndTime, StartTime, EndTime
+          // Extract selected start time (patient's chosen time) or fall back to availability times
+          // Backend returns PascalCase: SelectedStartTime, StartTime, EndTime
           // Also check availability object
           const selectedStartTime =
             apt.SelectedStartTime || apt.selectedStartTime || null;
-          const selectedEndTime =
-            apt.SelectedEndTime || apt.selectedEndTime || null;
           const availability = apt.Availability || apt.availability;
 
-          // Get times - prioritize selected times, then use StartTime/EndTime from response, then availability
+          // Get start time - prioritize selected time, then use StartTime from response, then availability
           const startTime =
             selectedStartTime ||
             apt.StartTime ||
             apt.startTime ||
             availability?.StartTime ||
             availability?.startTime ||
-            null;
-          const endTime =
-            selectedEndTime ||
-            apt.EndTime ||
-            apt.endTime ||
-            availability?.EndTime ||
-            availability?.endTime ||
             null;
 
           return {
@@ -93,14 +81,9 @@ const ServiceRequestsApproval: React.FC = () => {
             status: apt.Status || apt.status || "Pending",
             availabilityId: apt.AvailabilityId || apt.availabilityId,
             date: apt.Date || apt.date,
-            // Store both selected and final times
             startTime: startTime,
-            endTime: endTime,
-            selectedStartTime: selectedStartTime,
-            selectedEndTime: selectedEndTime,
-            visitNote: apt.VisitNote || apt.visitNote,
             createdAt: apt.CreatedAt || apt.createdAt,
-            tasks: apt.Tasks || apt.tasks || [],
+            serviceType: apt.ServiceType || apt.serviceType || "",
             patientName,
             patientEmail,
             workerName: apt.WorkerName || apt.workerName || "Unknown",
@@ -212,7 +195,6 @@ const ServiceRequestsApproval: React.FC = () => {
       }
       return timeStr;
     } catch (err) {
-      console.warn("Error formatting time:", timeString, err);
       return String(timeString || "N/A");
     }
   };
@@ -232,19 +214,7 @@ const ServiceRequestsApproval: React.FC = () => {
   };
 
   const getServiceType = (appointment: ServiceRequestWithPatient): string => {
-    if (appointment.tasks && appointment.tasks.length > 0) {
-      const firstTask = appointment.tasks[0];
-      if (typeof firstTask === "string") {
-        return firstTask;
-      } else if (firstTask && typeof firstTask === "object") {
-        return (
-          (firstTask as any).description ||
-          (firstTask as any).Description ||
-          "N/A"
-        );
-      }
-    }
-    return "N/A";
+    return appointment.serviceType || "N/A";
   };
 
   const pendingAppointments = appointments.filter(
@@ -313,21 +283,9 @@ const ServiceRequestsApproval: React.FC = () => {
                       <tr key={appointment.id}>
                         <td>{formatDate(appointment.date)}</td>
                         <td>
-                          {(() => {
-                            // Use the times we already extracted in loadAppointments
-                            const startTime = appointment.startTime;
-                            const endTime = appointment.endTime;
-
-                            if (startTime) {
-                              const formattedStart = formatTime(startTime);
-                              if (endTime) {
-                                const formattedEnd = formatTime(endTime);
-                                return `${formattedStart} - ${formattedEnd}`;
-                              }
-                              return formattedStart;
-                            }
-                            return "N/A";
-                          })()}
+                          {appointment.startTime
+                            ? formatTime(appointment.startTime)
+                            : "N/A"}
                         </td>
                         <td>
                           <>
@@ -426,21 +384,9 @@ const ServiceRequestsApproval: React.FC = () => {
                       <tr key={appointment.id}>
                         <td>{formatDate(appointment.date)}</td>
                         <td>
-                          {(() => {
-                            // Use the times we already extracted in loadAppointments
-                            const startTime = appointment.startTime;
-                            const endTime = appointment.endTime;
-
-                            if (startTime) {
-                              const formattedStart = formatTime(startTime);
-                              if (endTime) {
-                                const formattedEnd = formatTime(endTime);
-                                return `${formattedStart} - ${formattedEnd}`;
-                              }
-                              return formattedStart;
-                            }
-                            return "N/A";
-                          })()}
+                          {appointment.startTime
+                            ? formatTime(appointment.startTime)
+                            : "N/A"}
                         </td>
                         <td>
                           <>

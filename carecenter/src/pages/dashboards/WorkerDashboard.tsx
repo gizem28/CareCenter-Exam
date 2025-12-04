@@ -1,9 +1,12 @@
+// dashboard for helsearbeider
+// sağlık çalışanı paneli - müsaitlik ve randevuları yönetir
 import React, { useState, useEffect } from "react";
 import { Alert } from "react-bootstrap";
 import { useAuth } from "../../contexts/AuthContext";
 import type { AvailabilityDTO } from "../../api/availabilities";
 import type { AppointmentDTO } from "../../api/appointments";
-import { apiService } from "../../services/apiService";
+import { availabilityRequests } from "../../api/availabilities";
+import { appointmentRequests } from "../../api/appointments";
 import { healthcareWorkerRequests } from "../../api/healthcareWorkers";
 import { patientRequests } from "../../api/patients";
 import type { PatientDTO } from "../../api/patients";
@@ -13,10 +16,9 @@ import ConfirmationModal from "../../components/shared/ConfirmationModal";
 import AvailabilityFormModal from "../../components/worker/AvailabilityFormModal";
 import AvailabilityTable from "../../components/worker/AvailabilityTable";
 import AppointmentTable from "../../components/worker/AppointmentTable";
-import AppointmentDetailsModal from "../../components/worker/AppointmentDetailsModal";
+import AppointmentDetailsModal from "../../components/shared/AppointmentDetailsModal";
 import "../../css/Worker.css";
 
-// Main dashboard for healthcare workers to manage availability and appointments
 const WorkerDashboard: React.FC = () => {
   const { user } = useAuth();
   const [workerId, setWorkerId] = useState<number | null>(null);
@@ -38,17 +40,9 @@ const WorkerDashboard: React.FC = () => {
     availabilityId: number | null;
   }>({ isOpen: false, availabilityId: null });
 
-  const [appointments, setAppointments] = useState<
-    (AppointmentDTO & {
-      tasks?: Array<{ description: string; done: boolean }>;
-    })[]
-  >([]);
-  const [selectedAppointment, setSelectedAppointment] = useState<
-    | (AppointmentDTO & {
-        tasks?: Array<{ description: string; done: boolean }>;
-      })
-    | null
-  >(null);
+  const [appointments, setAppointments] = useState<AppointmentDTO[]>([]);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<AppointmentDTO | null>(null);
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [patientInfo, setPatientInfo] = useState<PatientDTO | null>(null);
   const [loadingPatient, setLoadingPatient] = useState(false);
@@ -72,7 +66,7 @@ const WorkerDashboard: React.FC = () => {
     setSelectedCalendarAvailability(null);
   }, [viewMode]);
 
-  // Load initial worker information and data
+  // hent arbeider info og data
   const loadWorkerData = async () => {
     if (!user?.email) return;
     try {
@@ -95,49 +89,40 @@ const WorkerDashboard: React.FC = () => {
     }
   };
 
+  // hent tilgjengeligheter for arbeider
   const loadAvailabilities = async (id: number) => {
     try {
-      const workerAvailabilities = await apiService.get<AvailabilityDTO[]>(
-        `/availabilities/worker/${id}`
-      );
+      const workerAvailabilities = await availabilityRequests.getByWorker(id);
       setAvailabilities(workerAvailabilities);
     } catch (err: any) {
-      console.error("Failed to load availabilities:", err);
+      setError("Failed to load availabilities");
     }
   };
 
+  // hent avtaler for arbeider
   const loadAppointments = async (id: number) => {
     try {
-      const data = await apiService.get<any[]>(`/appointments/worker/${id}`);
-      const mappedAppointments: (AppointmentDTO & {
-        tasks?: Array<{ description: string; done: boolean }>;
-      })[] = data.map((item) => ({
-        id: item.id,
-        patientId: item.patientId,
-        workerId: id,
-        workerName: item.workerName,
-        appointmentDate: item.date,
-        appointmentTime:
-          item.startTime ||
-          item.selectedStartTime ||
-          item.availability?.startTime ||
-          "", // Use the time from API response
-        selectedStartTime: item.selectedStartTime,
-        selectedEndTime: item.selectedEndTime,
-        status: item.status,
-        notes: item.visitNote,
-        serviceType: "",
-        availabilityId: item.availability?.id,
-        availability: item.availability,
-        tasks: item.tasks,
-      }));
+      const data = await appointmentRequests.getByWorker(id);
+      const mappedAppointments: AppointmentDTO[] = data.map((item) => {
+        // formater tid fra selectedStartTime
+        let appointmentTime = "";
+        if (item.selectedStartTime) {
+          appointmentTime = formatTime(item.selectedStartTime);
+        }
+
+        return {
+          ...item,
+          workerId: id,
+          appointmentTime: appointmentTime,
+        };
+      });
       setAppointments(mappedAppointments);
     } catch (err: any) {
-      console.error("Failed to load appointments:", err);
+      setError("Failed to load appointments");
     }
   };
 
-  // Helper function to check if date is within 30 days from today
+  // sjekk om dato er innen 30 dager
   const isWithin30Days = (dateStr: string): boolean => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -223,16 +208,16 @@ const WorkerDashboard: React.FC = () => {
       }
 
       const availabilities = dates.map((date) => {
-        const payload: any = { healthcareWorkerId: workerId, date: date };
+        const payload: Partial<AvailabilityDTO> = {
+          healthcareWorkerId: workerId,
+          date: date,
+        };
         if (startTime) payload.startTime = convertTimeToTimeSpan(startTime);
         if (endTime) payload.endTime = convertTimeToTimeSpan(endTime);
         return payload;
       });
 
-      const response = await apiService.post<any>(
-        "/availabilities",
-        availabilities
-      );
+      const response = await availabilityRequests.createBatch(availabilities);
       if (response.errors && response.errors.length > 0) {
         const errorMsg = response.errors
           .map(
@@ -304,10 +289,7 @@ const WorkerDashboard: React.FC = () => {
         updateData.endTime = null;
       }
 
-      await apiService.put(
-        `/availabilities/${editingAvailability.id}`,
-        updateData
-      );
+      await availabilityRequests.update(editingAvailability.id, updateData);
       await loadAvailabilities(workerId);
       resetForm();
       setEditingAvailability(null);
@@ -324,9 +306,7 @@ const WorkerDashboard: React.FC = () => {
   const confirmDeleteAvailability = async () => {
     if (!deleteConfirmation.availabilityId) return;
     try {
-      await apiService.delete(
-        `/availabilities/${deleteConfirmation.availabilityId}`
-      );
+      await availabilityRequests.delete(deleteConfirmation.availabilityId);
       if (workerId) {
         await loadAvailabilities(workerId);
       }
@@ -392,7 +372,7 @@ const WorkerDashboard: React.FC = () => {
         const patient = await patientRequests.getById(appointment.patientId);
         setPatientInfo(patient);
       } catch (err: any) {
-        console.error("Failed to load patient information:", err);
+        // feilet å laste pasient info
       } finally {
         setLoadingPatient(false);
       }
@@ -488,18 +468,18 @@ const WorkerDashboard: React.FC = () => {
 
   const handleCalendarDateClick = (value: Date) => {
     const availability = getAvailabilityForDate(value);
-    if (availability) {
+    if (availability && availability.isBooked) {
+      // For booked dates, show appointment details
+      const appointment = getAppointmentForAvailability(availability);
+      if (appointment) {
+        handleViewAppointment(appointment);
+      }
+    } else if (availability) {
+      // For available dates, show availability details
       setSelectedCalendarAvailability(availability);
     } else {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const clickedDate = new Date(value);
-      clickedDate.setHours(0, 0, 0, 0);
-      if (clickedDate >= today) {
-        setSelectedCalendarAvailability(null);
-      } else {
-        setSelectedCalendarAvailability(null);
-      }
+      // No availability for this date
+      setSelectedCalendarAvailability(null);
     }
   };
 
@@ -511,16 +491,12 @@ const WorkerDashboard: React.FC = () => {
 
   const getAppointmentForAvailability = (
     availability: AvailabilityDTO
-  ):
-    | (AppointmentDTO & {
-        tasks?: Array<{ description: string; done: boolean }>;
-      })
-    | undefined => {
+  ): AppointmentDTO | undefined => {
     if (!availability.isBooked || !availability.date) return undefined;
     const availabilityDateStr = availability.date.split("T")[0];
     return appointments.find((apt) => {
-      if (!apt.appointmentDate) return false;
-      const appointmentDateStr = apt.appointmentDate.split("T")[0];
+      if (!apt.date) return false;
+      const appointmentDateStr = apt.date.split("T")[0];
       return appointmentDateStr === availabilityDateStr;
     });
   };
@@ -644,8 +620,10 @@ const WorkerDashboard: React.FC = () => {
             ) : viewMode === "calendar" ? (
               <UnifiedCalendar
                 availabilities={availabilities}
+                appointments={appointments}
                 onDateClick={handleCalendarDateClick}
                 showBooked={true}
+                showApproved={true}
                 dotSize={6}
               />
             ) : (
@@ -653,9 +631,11 @@ const WorkerDashboard: React.FC = () => {
                 availabilities={availabilities}
                 onEdit={handleEditAvailability}
                 onDelete={handleDeleteAvailability}
+                onViewAppointment={handleViewAppointment}
                 formatDate={formatDate}
                 formatTime={formatTime}
                 isFutureDate={isFutureDate}
+                getAppointmentForAvailability={getAppointmentForAvailability}
               />
             )}
           </section>
@@ -684,9 +664,6 @@ const WorkerDashboard: React.FC = () => {
       {selectedCalendarAvailability && (
         <AvailabilityModal
           availability={selectedCalendarAvailability}
-          appointment={getAppointmentForAvailability(
-            selectedCalendarAvailability
-          )}
           onClose={() => setSelectedCalendarAvailability(null)}
           onEdit={handleEditAvailability}
           onDelete={handleDeleteAvailability}

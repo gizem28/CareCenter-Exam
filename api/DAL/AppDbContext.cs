@@ -16,19 +16,21 @@ namespace CareCenter.DAL
         public DbSet<HealthcareWorker> HealthcareWorkers { get; set; }
         public DbSet<Availability> Availabilities { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
-        public DbSet<Patient> Patients { get; set; }
         public DbSet<AppointmentTask> AppointmentTasks { get; set; }
+        public DbSet<Patient> Patients { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             // Availability (1) — (0..1) Appointment
+            // Using ClientSetNull: Appointment can be deleted, but Availability remains
+            // The navigation property is cleared on the client side, but no action in database
             modelBuilder.Entity<Availability>()
                 .HasOne(a => a.Appointment)
                 .WithOne(ap => ap.Availability)
                 .HasForeignKey<Appointment>(ap => ap.AvailabilityId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
 
       
             modelBuilder.Entity<Appointment>()

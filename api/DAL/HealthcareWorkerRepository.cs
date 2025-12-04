@@ -177,19 +177,18 @@ namespace CareCenter.DAL
                 if (w == null)
                     return false;
 
-                // Get all availabilities for this worker, including their appointments and tasks
+                // Get all availabilities for this worker, including their appointments
                 var availabilities = await _context.Availabilities
                     .Include(av => av.Appointment)
-                        .ThenInclude(apt => apt!.Tasks)
                     .Where(av => av.HealthcareWorkerId == id)
                     .ToListAsync();
 
-                // Delete all appointments and their tasks associated with this worker's availabilities
+                // Delete all appointments associated with this worker's availabilities
                 foreach (var availability in availabilities)
                 {
                     if (availability.Appointment != null)
                     {
-                        
+                        // Remove associated tasks before deleting appointment
                         if (availability.Appointment.Tasks != null && availability.Appointment.Tasks.Any())
                         {
                             _context.AppointmentTasks.RemoveRange(availability.Appointment.Tasks);

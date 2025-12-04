@@ -13,8 +13,7 @@ interface UpdateAppointmentModalProps {
   onConfirm: (
     availabilityId: number,
     serviceType?: ServiceType,
-    selectedStartTime?: string,
-    selectedEndTime?: string // Keep for backward compatibility but won't be used
+    selectedStartTime?: string
   ) => Promise<void>;
   appointment: AppointmentDTO | null;
   loading?: boolean;
@@ -192,30 +191,7 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
   useEffect(() => {
     if (isOpen && appointment) {
       // Set initial service type from appointment
-      if (appointment.tasks && appointment.tasks.length > 0) {
-        const firstTask = appointment.tasks[0];
-        if (typeof firstTask === "string") {
-          const taskString = firstTask as string;
-          const serviceType = serviceTypes.find(
-            (st) => st === taskString || st === taskString.replace(/\s/g, "")
-          );
-          if (serviceType) {
-            setSelectedServiceType(serviceType);
-          }
-        } else if (firstTask && typeof firstTask === "object") {
-          const taskDescription =
-            firstTask.description || (firstTask as any).Description || "";
-          const serviceType = serviceTypes.find(
-            (st) =>
-              st === taskDescription ||
-              st === taskDescription.replace(/\s/g, "") ||
-              st.toLowerCase() === taskDescription.toLowerCase()
-          );
-          if (serviceType) {
-            setSelectedServiceType(serviceType);
-          }
-        }
-      } else if (appointment.serviceType) {
+      if (appointment.serviceType) {
         const serviceType = serviceTypes.find(
           (st) =>
             st === appointment.serviceType ||
@@ -350,11 +326,7 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
             }
           }
         } catch (err) {
-          // If we can't fetch the current availability, just use unbooked ones
-          console.warn(
-            "Could not fetch current appointment availability:",
-            err
-          );
+          // hvis vi ikke kan hente nåværende tilgjengelighet, bruk ledige
         }
       }
 
@@ -413,8 +385,7 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
       await onConfirm(
         availabilityIdToUse,
         selectedServiceType,
-        selectedStartTimeFormatted,
-        undefined // No end time
+        selectedStartTimeFormatted
       );
       // Reset form
       setSelectedDate(null);
@@ -693,4 +664,3 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
 };
 
 export default UpdateAppointmentModal;
-

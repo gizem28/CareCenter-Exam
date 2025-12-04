@@ -23,14 +23,24 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
             </div>
             <div className="d-grid gap-2 mt-auto">
               <a
+                href="/patients/create"
+                className="btn btn-outline-success"
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                  e.preventDefault();
+                  navigate("/patients/create");
+                }}
+              >
+                <i className="bi bi-person-plus"></i> Register Patient
+              </a>
+              <a
                 href="/patients"
-                className="btn btn-outline-secondary"
+                className="btn btn-outline-success"
                 onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
                   e.preventDefault();
                   navigate("/patients");
                 }}
               >
-                <i className="bi bi-list"></i> Manage Patients
+                <i className="bi bi-people"></i> View All Patients
               </a>
             </div>
           </div>
@@ -79,19 +89,9 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
               <small className="text-muted">Total Appointments</small>
             </div>
             <div className="d-grid gap-2 mt-auto">
-              <a
-                href="/admin/service-requests"
-                className="btn btn-outline-primary btn-sm"
-                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-                  e.preventDefault();
-                  navigate("/admin/service-requests");
-                }}
-              >
-                <i className="bi bi-clipboard-check"></i> Approve Requests
-              </a>
               <button
                 type="button"
-                className="btn btn-outline-info btn-sm"
+                className="btn btn-outline-success"
                 onClick={() => {
                   const element = document.getElementById(
                     "appointments-section"

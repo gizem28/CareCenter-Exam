@@ -1,12 +1,11 @@
+// tabell for å vise avtaler til helsearbeider
 import React, { useState, useEffect } from "react";
 import { Table, Badge, Button } from "react-bootstrap";
 import type { AppointmentDTO } from "../../api/appointments";
 import { patientRequests } from "../../api/patients";
 
 interface AppointmentTableProps {
-  appointments: (AppointmentDTO & {
-    tasks?: Array<{ description: string; done: boolean }>;
-  })[];
+  appointments: AppointmentDTO[];
   onView: (appointment: AppointmentDTO) => void;
   formatDate: (dateString?: string | null) => string;
   formatTime: (timeString?: string | null) => string;
@@ -51,7 +50,6 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
             const patient = await patientRequests.getById(patientId);
             return { id: patientId, name: patient.fullName };
           } catch (error) {
-            console.error(`Failed to fetch patient ${patientId}:`, error);
             return { id: patientId, name: `Patient #${patientId}` };
           }
         });
@@ -64,7 +62,7 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
 
         setPatientNames((prev) => ({ ...prev, ...newPatientNames }));
       } catch (error) {
-        console.error("Failed to fetch patient names:", error);
+        // feilet å hente pasient navn
       } finally {
         setLoadingPatients((prev) => {
           const newSet = new Set(prev);
@@ -110,12 +108,12 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
           {appointments
             .sort(
               (a, b) =>
-                new Date(b.appointmentDate || 0).getTime() -
-                new Date(a.appointmentDate || 0).getTime()
+                new Date(b.date || 0).getTime() -
+                new Date(a.date || 0).getTime()
             )
             .map((appointment) => (
               <tr key={appointment.id}>
-                <td>{formatDate(appointment.appointmentDate)}</td>
+                <td>{formatDate(appointment.date)}</td>
                 <td>{formatTime(appointment.appointmentTime)}</td>
                 <td>
                   <Badge bg={getStatusBadge(appointment.status)}>

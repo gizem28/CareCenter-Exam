@@ -13,7 +13,6 @@ interface ServiceRequestListProps {
       status?: string;
       serviceType?: string;
       selectedStartTime?: string;
-      selectedEndTime?: string;
     }
   ) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
@@ -32,7 +31,6 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
     useState<AppointmentDTO | null>(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [actionError, setActionError] = useState<string>("");
 
   const handleDeleteClick = (appointment: AppointmentDTO) => {
     setSelectedAppointment(appointment);
@@ -44,19 +42,11 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
 
     try {
       setDeletingId(selectedAppointment.id);
-      setActionError("");
       await onDelete(selectedAppointment.id);
       setDeleteModalOpen(false);
       setSelectedAppointment(null);
-      setActionError("");
-    } catch (error: any) {
-      // Display error to user
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to delete appointment. Please try again.";
-      setActionError(errorMessage);
-      console.error("Delete error:", error);
+    } catch (error) {
+      // Error handling is done in parent component
     } finally {
       setDeletingId(null);
     }
@@ -70,32 +60,22 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
   const handleUpdateConfirm = async (
     availabilityId: number,
     serviceType?: string,
-    selectedStartTime?: string,
-    selectedEndTime?: string
+    selectedStartTime?: string
   ) => {
     if (!selectedAppointment) return;
 
     try {
       setUpdatingId(selectedAppointment.id);
-      setActionError("");
       await onUpdate(selectedAppointment.id, {
         availabilityId,
         serviceType: serviceType || undefined,
         selectedStartTime,
-        selectedEndTime,
       });
       setUpdateModalOpen(false);
       setSelectedAppointment(null);
-      setActionError("");
-    } catch (error: any) {
-      // Display error to user
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to update appointment. Please try again.";
-      setActionError(errorMessage);
-      console.error("Update error:", error);
-      // Keep modal open so user can see error and retry
+    } catch (error) {
+      // Error handling is done in parent component
+      throw error;
     } finally {
       setUpdatingId(null);
     }
@@ -147,34 +127,13 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
     }
   };
 
-  // Get service type from tasks array (first task is usually the service type)
   const getServiceType = (appointment: AppointmentDTO): string => {
-    let serviceType = "";
-    if (appointment.serviceType) {
-      serviceType = appointment.serviceType;
-    } else if (appointment.tasks && appointment.tasks.length > 0) {
-      const firstTask = appointment.tasks[0];
-      // Handle both object format {description: string} and string format
-      if (typeof firstTask === "string") {
-        serviceType = firstTask;
-      } else if (firstTask && typeof firstTask === "object") {
-        serviceType =
-          firstTask.description || (firstTask as any).Description || "N/A";
-      }
-    } else {
-      return "N/A";
-    }
-
-    // Format service type: "Medical Care" instead of "MedicalCare"
-    return serviceType.replace(/([A-Z])/g, " $1").trim();
+    return appointment.serviceType || "N/A";
   };
 
   // Check if appointment can be deleted (not past or same day)
   const canDeleteAppointment = (appointment: AppointmentDTO): boolean => {
-    const appointmentDate =
-      appointment.date ||
-      appointment.appointmentDate ||
-      appointment.availability?.date;
+    const appointmentDate = appointment.date || appointment.availability?.date;
     if (!appointmentDate) {
       return false;
     }
@@ -191,18 +150,6 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
   return (
     <div className="service-request-list">
       <h2 className="h4 text-primary fw-bold mb-3">My Appointments</h2>
-
-      {actionError && (
-        <div className="alert alert-danger alert-dismissible fade show" role="alert">
-          <i className="bi bi-exclamation-circle"></i> {actionError}
-          <button
-            type="button"
-            className="btn-close"
-            onClick={() => setActionError("")}
-            aria-label="Close"
-          ></button>
-        </div>
-      )}
 
       {loading && appointments.length === 0 ? (
         <div className="text-center p-4">
@@ -229,10 +176,8 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
               {appointments
                 .sort((a, b) => {
                   // Sort by date first, then by time
-                  const dateA =
-                    a.date || a.appointmentDate || a.availability?.date || "";
-                  const dateB =
-                    b.date || b.appointmentDate || b.availability?.date || "";
+                  const dateA = a.date || a.availability?.date || "";
+                  const dateB = b.date || b.availability?.date || "";
 
                   if (dateA && dateB) {
                     const dateCompare =
@@ -266,9 +211,7 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
                   <tr key={appointment.id}>
                     <td>
                       {formatDate(
-                        appointment.date ||
-                          appointment.appointmentDate ||
-                          appointment.availability?.date
+                        appointment.date || appointment.availability?.date
                       )}
                     </td>
                     <td>
@@ -301,7 +244,7 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
                     <td>
                       <div className="d-flex gap-2">
                         <Button
-                          className="btn-outline-teal"
+                          variant="outline-primary"
                           size="sm"
                           onClick={() => handleUpdateClick(appointment)}
                           disabled={
@@ -377,4 +320,3 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
 };
 
 export default ServiceRequestList;
-

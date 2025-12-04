@@ -5,11 +5,7 @@ import type { PatientDTO } from "../../api/patients";
 
 interface AppointmentDetailsModalProps {
   isOpen: boolean;
-  appointment:
-    | (AppointmentDTO & {
-        tasks?: Array<{ description: string; done: boolean }>;
-      })
-    | null;
+  appointment: AppointmentDTO | null;
   patientInfo: PatientDTO | null;
   loadingPatient: boolean;
   onClose: () => void;
@@ -25,16 +21,6 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
   formatDate,
 }) => {
   if (!isOpen || !appointment) return null;
-
-  const getStatusBadge = (status: string | undefined) => {
-    const statusLower = (status || "Pending").toLowerCase();
-    if (statusLower === "approved") return "badge-success";
-    if (statusLower === "pending") return "badge-warning";
-    if (statusLower === "rejected") return "badge-danger";
-    if (statusLower === "cancelled" || statusLower === "completed")
-      return "badge-secondary";
-    return "badge-info";
-  };
 
   return (
     <Modal show={isOpen} onHide={onClose} size="lg" centered>
@@ -99,7 +85,7 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
           <div className="row">
             <div className="col-sm-6">
               <p>
-                <strong>Date:</strong> {formatDate(appointment.appointmentDate)}
+                <strong>Date:</strong> {formatDate(appointment.date)}
               </p>
             </div>
             {appointment.appointmentTime && (
@@ -111,54 +97,16 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
             )}
           </div>
           <p>
-            <strong>Status:</strong>{" "}
-            <span className={`badge ${getStatusBadge(appointment.status)}`}>
-              {appointment.status || "Pending"}
-            </span>
+            <strong>Status:</strong> <span>{appointment.status}</span>
           </p>
           <p>
             <strong>Patient ID:</strong> {appointment.patientId}
           </p>
 
-          {appointment.notes && (
-            <div className="mb-3">
-              <strong>Notes:</strong>
-              <div className="mt-2 p-3 bg-light rounded">
-                {appointment.notes}
-              </div>
-            </div>
-          )}
-
           {appointment.serviceType && (
             <p>
               <strong>Service Type:</strong> {appointment.serviceType}
             </p>
-          )}
-
-          {appointment.tasks && appointment.tasks.length > 0 && (
-            <div>
-              <strong>Tasks:</strong>
-              <ul className="list-group mt-2">
-                {appointment.tasks.map((task, idx) => (
-                  <li
-                    key={idx}
-                    className="list-group-item d-flex align-items-center"
-                    style={{
-                      textDecoration: task.done ? "line-through" : "none",
-                      color: task.done ? "#6c757d" : "inherit",
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={task.done}
-                      readOnly
-                      className="me-2"
-                    />
-                    {task.description}
-                  </li>
-                ))}
-              </ul>
-            </div>
           )}
         </div>
       </Modal.Body>

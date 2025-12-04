@@ -60,9 +60,9 @@ const Home: React.FC = () => {
   return (
     <>
       {/* ------------------- MAIN CONTENT ------------------- */}
-      <main className="pb-4">
+      <main className="pb-2">
         {/* HEADER / HERO SECTION */}
-        <section className="section py-5">
+        <section className="section py-3">
           <div className="container">
             <div className="row align-items-center g-5">
               {/* ------------------- LEFT COLUMN ------------------- */}
@@ -86,7 +86,7 @@ const Home: React.FC = () => {
                   src="/images/hero.webp"
                   alt="Nurse supporting an elderly patient"
                   className="img-fluid rounded-3 shadow-sm"
-                  style={{ maxWidth: "100%", height: "auto" }}
+                  style={{ maxWidth: "80%", height: "auto" }}
                   onError={(e) => {
                     // Fallback if image doesn't exist
                     e.currentTarget.style.display = "none";

@@ -6,18 +6,22 @@ interface AvailabilityTableProps {
   availabilities: AvailabilityDTO[];
   onEdit: (availability: AvailabilityDTO) => void;
   onDelete: (id: number) => void;
+  onViewAppointment?: (appointment: any) => void;
   formatDate: (dateString?: string | null) => string;
   formatTime: (timeString?: string | null) => string;
   isFutureDate: (dateString?: string) => boolean;
+  getAppointmentForAvailability?: (availability: AvailabilityDTO) => any;
 }
 
 const AvailabilityTable: React.FC<AvailabilityTableProps> = ({
   availabilities,
   onEdit,
   onDelete,
+  onViewAppointment,
   formatDate,
   formatTime,
   isFutureDate,
+  getAppointmentForAvailability,
 }) => {
   return (
     <div className="table-responsive">
@@ -53,24 +57,44 @@ const AvailabilityTable: React.FC<AvailabilityTableProps> = ({
                   </Badge>
                 </td>
                 <td>
-                  {isFutureDate(availability.date) && (
-                    <div className="d-flex gap-2">
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        onClick={() => onEdit(availability)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outline-danger"
-                        size="sm"
-                        onClick={() => onDelete(availability.id)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  )}
+                  <div className="d-flex gap-2">
+                    {availability.isBooked &&
+                      onViewAppointment &&
+                      getAppointmentForAvailability && (
+                        <Button
+                          variant="outline-info"
+                          size="sm"
+                          onClick={() => {
+                            const appointment =
+                              getAppointmentForAvailability(availability);
+                            if (appointment) {
+                              onViewAppointment(appointment);
+                            }
+                          }}
+                        >
+                          View Details
+                        </Button>
+                      )}
+                    {isFutureDate(availability.date) &&
+                      !availability.isBooked && (
+                        <>
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => onEdit(availability)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => onDelete(availability.id)}
+                          >
+                            Delete
+                          </Button>
+                        </>
+                      )}
+                  </div>
                 </td>
               </tr>
             ))}

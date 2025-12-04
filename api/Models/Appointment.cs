@@ -19,6 +19,9 @@ namespace CareCenter.Models
         [Required]
         public string Status { get; set; } = "Pending";
 
+        [Required]
+        public string ServiceType { get; set; } = string.Empty;
+
         public string? VisitNote { get; set; }
 
         public DateTime RequestedLocalTime { get; set; }    

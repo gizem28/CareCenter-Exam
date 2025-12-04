@@ -1,5 +1,5 @@
-// Base API service for handling HTTP requests
-// This handles all communication with backend
+// api service klasse for å kommunisere med backend
+// tüm api isteklerini yöneten servis
 
 const API_BASE_URL = "http://localhost:5000/api";
 
@@ -9,7 +9,6 @@ interface RequestOptions {
   body?: unknown;
 }
 
-// Main class for API communication
 class ApiService {
   private baseUrl: string;
 
@@ -17,14 +16,12 @@ class ApiService {
     this.baseUrl = API_BASE_URL;
   }
 
-  // Get JWT token from local storage for API calls
-  // Dette henter autentiseringstoken fra browser
+  // hent jwt token fra localstorage
   private getAuthToken(): string | null {
     return localStorage.getItem("token");
   }
 
-  // Build headers for API requests including auth token
-  // Dette lager riktige headers med Bearer token
+  // lag headers med auth token
   private getHeaders(customHeaders?: Record<string, string>): HeadersInit {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -39,7 +36,7 @@ class ApiService {
     return headers;
   }
 
-  // Handle API response and parse JSON or return empty for delete operations
+  // håndter api svar og parse json
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({
@@ -54,11 +51,11 @@ class ApiService {
       };
     }
 
-    // Check if response has content before parsing JSON
+    // sjekk om response har innhold
     const contentType = response.headers.get("content-type");
     const contentLength = response.headers.get("content-length");
 
-    // If no content or empty response (204 No Content, etc.), return undefined cast to T
+    // tom respons (204 etc) returner undefined
     if (
       response.status === 204 ||
       contentLength === "0" ||
@@ -67,24 +64,22 @@ class ApiService {
       return undefined as T;
     }
 
-    // Check if response body is empty by reading as text first
+    // les body som tekst først
     const text = await response.text();
 
-    // If empty, return undefined
     if (!text || text.trim() === "") {
       return undefined as T;
     }
 
-    // Try to parse as JSON
+    // prøv å parse som json
     try {
       return JSON.parse(text) as T;
     } catch (error) {
-      // If parsing fails, return undefined (for delete operations that return empty)
       return undefined as T;
     }
   }
 
-  // GET request method for fetching data from API
+  // get request
   async get<T>(endpoint: string, options?: RequestOptions): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     const response = await fetch(url, {
@@ -95,7 +90,7 @@ class ApiService {
     return this.handleResponse<T>(response);
   }
 
-  // POST request for creating new data like new appointments
+  // post request for å opprette data
   async post<T>(
     endpoint: string,
     data?: unknown,

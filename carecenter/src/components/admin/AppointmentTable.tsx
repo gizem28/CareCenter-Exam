@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import type { AppointmentDTO } from "../../api/appointments";
 
 interface AppointmentTableProps {
   appointments: AppointmentDTO[];
   onView: (appointment: AppointmentDTO) => void;
+  onApprove?: (id: number) => Promise<void>;
+  onReject?: (id: number) => Promise<void>;
   formatDate: (dateString: string | undefined) => string;
   getServiceType: (appointment: any) => string;
 }
@@ -11,9 +13,47 @@ interface AppointmentTableProps {
 const AppointmentTable: React.FC<AppointmentTableProps> = ({
   appointments,
   onView,
+  onApprove,
+  onReject,
   formatDate,
   getServiceType,
 }) => {
+  const [processingIds, setProcessingIds] = useState<Set<number>>(new Set());
+
+  const handleApprove = async (id: number) => {
+    if (!onApprove || processingIds.has(id)) return;
+    setProcessingIds((prev) => new Set(prev).add(id));
+    try {
+      await onApprove(id);
+    } finally {
+      setProcessingIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
+    }
+  };
+
+  const handleReject = async (id: number) => {
+    if (!onReject || processingIds.has(id)) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to reject this appointment? The time slot will be released."
+      )
+    ) {
+      return;
+    }
+    setProcessingIds((prev) => new Set(prev).add(id));
+    try {
+      await onReject(id);
+    } finally {
+      setProcessingIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
+    }
+  };
   const getStatusBadge = (status: string | undefined) => {
     const statusLower = (status || "Pending").toLowerCase();
     if (statusLower === "approved") return "bg-success";
@@ -65,11 +105,7 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
                         {appointment.workerName ||
                           `Worker #${appointment.workerId}`}
                       </td>
-                      <td>
-                        {formatDate(
-                          appointment.appointmentDate || appointment.date
-                        )}
-                      </td>
+                      <td>{formatDate(appointment.date)}</td>
                       <td>
                         <span className="badge bg-info">
                           {getServiceType(appointment)}
@@ -85,14 +121,58 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
                         </span>
                       </td>
                       <td>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline-info"
-                          onClick={() => onView(appointment)}
-                          title="View details"
-                        >
-                          <i className="bi bi-eye"></i> View Details
-                        </button>
+                        <div className="d-flex gap-1 flex-wrap">
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-info"
+                            onClick={() => onView(appointment)}
+                            title="View details"
+                          >
+                            <i className="bi bi-eye"></i>
+                          </button>
+                          {appointment.status?.toLowerCase() === "pending" &&
+                            onApprove &&
+                            onReject && (
+                              <>
+                                <button
+                                  type="button"
+                                  className="btn btn-sm btn-success"
+                                  onClick={() => handleApprove(appointment.id)}
+                                  disabled={processingIds.has(appointment.id)}
+                                  title="Approve appointment"
+                                >
+                                  {processingIds.has(appointment.id) ? (
+                                    <span
+                                      className="spinner-border spinner-border-sm"
+                                      role="status"
+                                    />
+                                  ) : (
+                                    <>
+                                      <i className="bi bi-check"></i> Approve
+                                    </>
+                                  )}
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn btn-sm btn-danger"
+                                  onClick={() => handleReject(appointment.id)}
+                                  disabled={processingIds.has(appointment.id)}
+                                  title="Reject appointment"
+                                >
+                                  {processingIds.has(appointment.id) ? (
+                                    <span
+                                      className="spinner-border spinner-border-sm"
+                                      role="status"
+                                    />
+                                  ) : (
+                                    <>
+                                      <i className="bi bi-x"></i> Reject
+                                    </>
+                                  )}
+                                </button>
+                              </>
+                            )}
+                        </div>
                       </td>
                     </tr>
                   ))}

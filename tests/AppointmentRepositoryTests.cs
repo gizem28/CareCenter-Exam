@@ -75,8 +75,7 @@ public class AppointmentRepositoryTests
             PatientId = patient.Id,
             RequestedLocalTime = DateTime.Today.AddDays(1).AddHours(10),
             SelectedStartTime = "10:00:00",
-            SelectedEndTime = "11:00:00",
-            Tasks = new List<string> { "Task 1", "Task 2" }
+            ServiceType = "Medical Care"
         };
 
         // Act
@@ -88,9 +87,8 @@ public class AppointmentRepositoryTests
         Assert.Equal(availability.Id, result.AvailabilityId);
         Assert.Equal(patient.Id, result.PatientId);
         Assert.Equal("Pending", result.Status);
-        Assert.Equal(2, result.Tasks.Count);
+        Assert.Equal("Medical Care", result.ServiceType);
         Assert.Equal(new TimeSpan(10, 0, 0), result.SelectedStartTime);
-        Assert.Equal(new TimeSpan(11, 0, 0), result.SelectedEndTime);
 
         // Verify appointment is linked to availability
         var updatedAvailability = await context.Availabilities
@@ -116,6 +114,7 @@ public class AppointmentRepositoryTests
             AvailabilityId = availability.Id,
             PatientId = patient.Id,
             Status = "Pending",
+            ServiceType = "Medical Care",
             RequestedLocalTime = DateTime.Today.AddDays(1).AddHours(10),
             CreatedAt = DateTime.UtcNow
         };
@@ -131,7 +130,7 @@ public class AppointmentRepositoryTests
             AvailabilityId = availability.Id,
             PatientId = patient.Id,
             RequestedLocalTime = DateTime.Today.AddDays(1).AddHours(11),
-            Tasks = new List<string>()
+            ServiceType = "Medication Delivery"
         };
 
         // Act & Assert
@@ -154,6 +153,7 @@ public class AppointmentRepositoryTests
             AvailabilityId = availability.Id,
             PatientId = patient.Id,
             Status = "Pending",
+            ServiceType = "Medical Care",
             RequestedLocalTime = DateTime.Today.AddDays(1).AddHours(10),
             CreatedAt = DateTime.UtcNow
         };
@@ -175,6 +175,7 @@ public class AppointmentRepositoryTests
             AvailabilityId = availability2.Id,
             PatientId = patient.Id,
             Status = "Approved",
+            ServiceType = "Medication Delivery",
             RequestedLocalTime = DateTime.Today.AddDays(2).AddHours(14),
             CreatedAt = DateTime.UtcNow
         };
@@ -225,6 +226,7 @@ public class AppointmentRepositoryTests
             AvailabilityId = availability.Id,
             PatientId = patient.Id,
             Status = "Pending",
+            ServiceType = "Personal Care",
             RequestedLocalTime = DateTime.Today.AddDays(1).AddHours(10),
             CreatedAt = DateTime.UtcNow
         };
@@ -256,6 +258,7 @@ public class AppointmentRepositoryTests
             AvailabilityId = availability.Id,
             PatientId = patient.Id,
             Status = "Pending",
+            ServiceType = "Companionship",
             RequestedLocalTime = DateTime.Today.AddDays(1).AddHours(10),
             CreatedAt = DateTime.UtcNow
         };
@@ -265,10 +268,8 @@ public class AppointmentRepositoryTests
         var updateDto = new AppointmentUpdateDto
         {
             Status = "Confirmed",
-            VisitNote = "Patient visit completed",
-            Tasks = new List<string> { "Updated Task 1", "Updated Task 2" },
-            SelectedStartTime = "10:30:00",
-            SelectedEndTime = "11:30:00"
+            ServiceType = "Personal Care",
+            SelectedStartTime = "10:30:00"
         };
 
         // Act
@@ -277,18 +278,15 @@ public class AppointmentRepositoryTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal("Confirmed", result.Status);
-        Assert.Equal("Patient visit completed", result.VisitNote);
-        Assert.Equal(2, result.Tasks.Count);
+        Assert.Equal("Personal Care", result.ServiceType);
         Assert.Equal(new TimeSpan(10, 30, 0), result.SelectedStartTime);
-        Assert.Equal(new TimeSpan(11, 30, 0), result.SelectedEndTime);
 
         // Verify in database
         var updatedAppointment = await context.Appointments
-            .Include(a => a.Tasks)
             .FirstOrDefaultAsync(a => a.Id == appointment.Id);
         Assert.NotNull(updatedAppointment);
         Assert.Equal("Confirmed", updatedAppointment.Status);
-        Assert.Equal("Patient visit completed", updatedAppointment.VisitNote);
+        Assert.Equal("Personal Care", updatedAppointment.ServiceType);
 
         context.Dispose();
     }
@@ -303,7 +301,7 @@ public class AppointmentRepositoryTests
         var updateDto = new AppointmentUpdateDto
         {
             Status = "Confirmed",
-            VisitNote = "Test note"
+            ServiceType = "Companionship"
         };
 
         // Act
@@ -328,6 +326,7 @@ public class AppointmentRepositoryTests
             AvailabilityId = availability.Id,
             PatientId = patient.Id,
             Status = "Pending",
+            ServiceType = "Medical Care",
             RequestedLocalTime = DateTime.Today.AddDays(1).AddHours(10),
             CreatedAt = DateTime.UtcNow
         };
@@ -350,6 +349,7 @@ public class AppointmentRepositoryTests
             AvailabilityId = bookedAvailability.Id,
             PatientId = patient.Id,
             Status = "Approved",
+            ServiceType = "Personal Care",
             RequestedLocalTime = DateTime.Today.AddDays(3).AddHours(14),
             CreatedAt = DateTime.UtcNow
         };
@@ -381,6 +381,7 @@ public class AppointmentRepositoryTests
             AvailabilityId = availability.Id,
             PatientId = patient.Id,
             Status = "Pending",
+            ServiceType = "Medication Delivery",
             RequestedLocalTime = DateTime.Today.AddDays(1).AddHours(10),
             CreatedAt = DateTime.UtcNow
         };
