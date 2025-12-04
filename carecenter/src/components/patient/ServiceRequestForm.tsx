@@ -10,7 +10,7 @@ export type ServiceType =
   | "Companionship"
   | "Personal Care";
 
-interface PatientCalendarFormProps {
+interface ServiceRequestFormProps {
   onSubmit: (data: {
     serviceType: ServiceType;
     availabilityId: number;
@@ -22,7 +22,7 @@ interface PatientCalendarFormProps {
   refreshTrigger?: number; // Trigger to refresh the calendar
 }
 
-const PatientCalendarForm: React.FC<PatientCalendarFormProps> = ({
+const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
   onSubmit,
   onCancel,
   existingAppointments,
@@ -416,11 +416,16 @@ const PatientCalendarForm: React.FC<PatientCalendarFormProps> = ({
         {/* Show worker name and position when only one worker is available */}
         {selectedDate && availableWorkersForDate.length == 1 && (
           <div className="mt-3">
-            <label className="form-label fw-semibold">
-              Worker: {availableWorkersForDate[0].healthcareWorkerName}
-              {availableWorkersForDate[0].healthcareWorkerPosition &&
-                ` (${availableWorkersForDate[0].healthcareWorkerPosition})`}
-            </label>
+            <div className="mb-1">
+              <span className="fw-semibold">Worker Name: </span>
+              <span>{availableWorkersForDate[0].healthcareWorkerName}</span>
+            </div>
+            {availableWorkersForDate[0].healthcareWorkerPosition && (
+              <div>
+                <span className="fw-semibold">Position: </span>
+                <span>{availableWorkersForDate[0].healthcareWorkerPosition}</span>
+              </div>
+            )}
           </div>
         )}
         {/* Time Selection - Show when date is selected and worker is chosen */}
@@ -490,4 +495,5 @@ const PatientCalendarForm: React.FC<PatientCalendarFormProps> = ({
   );
 };
 
-export default PatientCalendarForm;
+export default ServiceRequestForm;
+

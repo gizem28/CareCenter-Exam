@@ -21,6 +21,9 @@ const Login: React.FC = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showDevInfo, setShowDevInfo] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
   const { login, logout } = useAuth();
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState("");
@@ -54,10 +57,64 @@ const Login: React.FC = () => {
     patient: { email: "patient@carecenter.com", password: "Patient123!" },
   };
 
+  const validateField = (name: string, value: string): string => {
+    switch (name) {
+      case "email":
+        if (!value.trim()) return "Email is required";
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) return "Invalid email format";
+        return "";
+      case "password":
+        if (!value) return "Password is required";
+        if (value.length < 6) return "Password must be at least 6 characters";
+        return "";
+      default:
+        return "";
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+    
+    const emailError = validateField("email", email);
+    if (emailError) errors.email = emailError;
+    
+    const passwordError = validateField("password", password);
+    if (passwordError) errors.password = passwordError;
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value.trim()); // Sanitize: remove whitespace
+    // Clear validation error when user types
+    if (validationErrors.email) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.email;
+        return newErrors;
+      });
+    }
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    // Clear validation error when user types
+    if (validationErrors.password) {
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.password;
+        return newErrors;
+      });
+    }
+  };
+
   const fillCredentials = (type: "admin" | "worker" | "patient") => {
     const creds = devCredentials[type];
     setEmail(creds.email);
     setPassword(creds.password);
+    setValidationErrors({}); // Clear any validation errors
     if (type === "admin" || type === "worker") {
       setLoginType("healthcare");
     } else {
@@ -68,6 +125,12 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    // Validate form before submission
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -159,16 +222,23 @@ const Login: React.FC = () => {
                 Email
               </label>
               <input
-                className="form-control"
+                className={`form-control ${
+                  validationErrors.email ? "is-invalid" : ""
+                }`}
                 type="email"
                 id="email"
                 name="email"
                 autoComplete="username"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => handleEmailChange(e.target.value)}
                 required
                 disabled={loading}
               />
+              {validationErrors.email && (
+                <div className="invalid-feedback">
+                  {validationErrors.email}
+                </div>
+              )}
             </div>
 
             <div className="mb-3">
@@ -176,17 +246,24 @@ const Login: React.FC = () => {
                 Password
               </label>
               <input
-                className="form-control"
+                className={`form-control ${
+                  validationErrors.password ? "is-invalid" : ""
+                }`}
                 type="password"
                 id="password"
                 name="password"
                 autoComplete="current-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => handlePasswordChange(e.target.value)}
                 required
                 disabled={loading}
                 minLength={6}
               />
+              {validationErrors.password && (
+                <div className="invalid-feedback">
+                  {validationErrors.password}
+                </div>
+              )}
             </div>
 
             <button type="submit" className="btn btn-teal" disabled={loading}>
@@ -204,7 +281,12 @@ const Login: React.FC = () => {
               href="/"
               onClick={(e) => {
                 e.preventDefault();
-                navigate("/");
+                try {
+                  navigate("/");
+                } catch (error) {
+                  console.error("Navigation error:", error);
+                  window.location.href = "/";
+                }
               }}
             >
               Cancel
@@ -218,7 +300,12 @@ const Login: React.FC = () => {
                 href="/signup"
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate("/signup");
+                  try {
+                    navigate("/signup");
+                  } catch (error) {
+                    console.error("Navigation error:", error);
+                    window.location.href = "/signup";
+                  }
                 }}
                 className="text-teal text-decoration-none"
               >
@@ -233,7 +320,12 @@ const Login: React.FC = () => {
               href="/forgot-password"
               onClick={(e) => {
                 e.preventDefault();
-                navigate(`/forgot-password?type=${loginType}`);
+                try {
+                  navigate(`/forgot-password?type=${loginType}`);
+                } catch (error) {
+                  console.error("Navigation error:", error);
+                  window.location.href = `/forgot-password?type=${loginType}`;
+                }
               }}
               className="text-muted text-decoration-none"
             >

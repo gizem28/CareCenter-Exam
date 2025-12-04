@@ -26,89 +26,91 @@ import "./App.css";
 function AppContent() {
 
   return (
-    <>
+    <div className="app-layout">
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route
-          path="/admin/dashboard"
-          element={
-            <ProtectedRoute requiredRole="Admin">
-              <ManagerDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/service-requests"
-          element={
-            <ProtectedRoute requiredRole="Admin">
-              <ServiceRequestsApproval />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/patients"
-          element={
-            <ProtectedRoute requiredRole="Admin">
-              <PatientsList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/patients/:id"
-          element={
-            <ProtectedRoute requiredRole="Admin">
-              <EditPatient />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/workers"
-          element={
-            <ProtectedRoute requiredRole="Admin">
-              <WorkersList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/workers/create"
-          element={
-            <ProtectedRoute requiredRole="Admin">
-              <CreateWorker />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/workers/:id"
-          element={
-            <ProtectedRoute requiredRole="Admin">
-              <EditWorker />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/healthcare/dashboard"
-          element={
-            <ProtectedRoute>
-              <WorkerDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/patient/dashboard"
-          element={
-            <ProtectedRoute>
-              <PatientDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <main className="app-main-content">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute requiredRole="Admin">
+                <ManagerDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/service-requests"
+            element={
+              <ProtectedRoute requiredRole="Admin">
+                <ServiceRequestsApproval />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patients"
+            element={
+              <ProtectedRoute requiredRole="Admin">
+                <PatientsList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patients/:id"
+            element={
+              <ProtectedRoute requiredRole="Admin">
+                <EditPatient />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/workers"
+            element={
+              <ProtectedRoute requiredRole="Admin">
+                <WorkersList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/workers/create"
+            element={
+              <ProtectedRoute requiredRole="Admin">
+                <CreateWorker />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/workers/:id"
+            element={
+              <ProtectedRoute requiredRole="Admin">
+                <EditWorker />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/healthcare/dashboard"
+            element={
+              <ProtectedRoute>
+                <WorkerDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patient/dashboard"
+            element={
+              <ProtectedRoute>
+                <PatientDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
       <Footer />
-    </>
+    </div>
   );
 }
 
