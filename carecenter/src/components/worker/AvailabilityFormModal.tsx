@@ -1,5 +1,3 @@
-// Importing necessary stuff for the availability form
-// React for component, types for the data, and calendar component
 import React, { useEffect } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
 import type { AvailabilityDTO } from "../../api/availabilities";
@@ -7,7 +5,6 @@ import UnifiedCalendar from "../shared/UnifiedCalendar";
 
 // Props interface for the availability form modal
 // This defines all the data and functions the component needs
-// Some props have weird names but they work
 interface AvailabilityFormModalProps {
   isOpen: boolean; // if modal is showing
   editingAvailability: AvailabilityDTO | null; // when editing existing availability
@@ -36,8 +33,6 @@ interface AvailabilityFormModalProps {
 }
 
 // Main component for the availability form modal
-// This handles adding and editing healthcare worker availability
-// The props are destructured here which is a React pattern
 const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
   isOpen,
   editingAvailability,
@@ -399,5 +394,4 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
   );
 };
 
-// Export the component so it can be imported elsewhere
 export default AvailabilityFormModal;
