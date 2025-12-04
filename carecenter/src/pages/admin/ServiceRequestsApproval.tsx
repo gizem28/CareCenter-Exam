@@ -228,7 +228,7 @@ const ServiceRequestsApproval: React.FC = () => {
   return (
     <Container fluid className="mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Service Requests Approval</h2>
+        <h1 className="h2">Service Requests Approval</h1>
         <Button
           variant="outline-secondary"
           onClick={() => navigate("/admin/dashboard")}

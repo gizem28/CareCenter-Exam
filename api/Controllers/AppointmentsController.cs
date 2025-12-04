@@ -43,19 +43,29 @@ namespace CareCenter.Controllers
         }
 
         // 2️⃣ Get appointments for one patient
-        [HttpGet("patient/{patientId}")]
-        public async Task<IActionResult> GetByPatient(int patientId)
-        {
-            try
-            {
-                var appointments = await _repo.GetByPatientAsync(patientId);
-                return Ok(appointments);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error fetching appointments", detail = ex.Message });
-            }
-        }
+     [HttpGet("patient/{patientId}")]
+public async Task<IActionResult> GetByPatient(int patientId)
+{
+    try
+    {
+        var appointments = await _repo.GetByPatientAsync(patientId);
+
+        var now = DateTime.Now;
+
+        // SADECE gelecekteki appointment'lar
+       var upcoming = appointments
+    .Where(a => a.RequestedLocalTime >= DateTime.Now)
+    .ToList();
+
+
+        return Ok(upcoming);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { message = "Error fetching appointments", detail = ex.Message });
+    }
+}
+
         // 3️⃣ Update appointment (e.g., change status or reassign worker)
         // Allows changing appointment details, status, or worker assignment
         [HttpPut("{id}")]

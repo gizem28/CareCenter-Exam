@@ -10,7 +10,7 @@ export type ServiceType =
   | "Companionship"
   | "Personal Care";
 
-interface PatientCalendarFormProps {
+interface ServiceRequestFormProps {
   onSubmit: (data: {
     serviceType: ServiceType;
     availabilityId: number;
@@ -22,7 +22,7 @@ interface PatientCalendarFormProps {
   refreshTrigger?: number; // Trigger to refresh the calendar
 }
 
-const PatientCalendarForm: React.FC<PatientCalendarFormProps> = ({
+const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
   onSubmit,
   onCancel,
   existingAppointments,
@@ -257,7 +257,10 @@ const PatientCalendarForm: React.FC<PatientCalendarFormProps> = ({
 
   return (
     <div className="bg-white rounded p-3 shadow-sm patient-calendar-form">
-      <h2 className="h4 text-primary fw-bold mb-3">Create Service Request</h2>
+      <h2 className="h4 text-primary fw-bold mb-2">Create Service Request</h2>
+      <p className="text-muted small mb-3">
+        Please select the service you need from below and choose an available date and time.
+      </p>
 
       <Form onSubmit={handleSubmit}>
         {/* Service Type Selection */}
@@ -413,11 +416,16 @@ const PatientCalendarForm: React.FC<PatientCalendarFormProps> = ({
         {/* Show worker name and position when only one worker is available */}
         {selectedDate && availableWorkersForDate.length == 1 && (
           <div className="mt-3">
-            <label className="form-label fw-semibold">
-              Worker: {availableWorkersForDate[0].healthcareWorkerName}
-              {availableWorkersForDate[0].healthcareWorkerPosition &&
-                ` (${availableWorkersForDate[0].healthcareWorkerPosition})`}
-            </label>
+            <div className="mb-1">
+              <span className="fw-semibold">Worker Name: </span>
+              <span>{availableWorkersForDate[0].healthcareWorkerName}</span>
+            </div>
+            {availableWorkersForDate[0].healthcareWorkerPosition && (
+              <div>
+                <span className="fw-semibold">Position: </span>
+                <span>{availableWorkersForDate[0].healthcareWorkerPosition}</span>
+              </div>
+            )}
           </div>
         )}
         {/* Time Selection - Show when date is selected and worker is chosen */}
@@ -452,8 +460,7 @@ const PatientCalendarForm: React.FC<PatientCalendarFormProps> = ({
         <div className="d-flex gap-3 mt-4">
           <Button
             type="submit"
-            variant="primary"
-            className="flex-fill"
+            className="btn-light-teal flex-fill"
             disabled={loading || loadingDates || submittingRef.current}
           >
             {loading ? (
@@ -488,4 +495,5 @@ const PatientCalendarForm: React.FC<PatientCalendarFormProps> = ({
   );
 };
 
-export default PatientCalendarForm;
+export default ServiceRequestForm;
+

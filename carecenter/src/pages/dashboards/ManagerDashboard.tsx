@@ -230,7 +230,7 @@ const ManagerDashboard: React.FC = () => {
     >
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h3>Welcome Admin</h3>
+          <h1 className="h3">Welcome Admin</h1>
           {user && (
             <p className="text-muted mb-0">Logged in as: {user.fullName}</p>
           )}

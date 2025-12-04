@@ -5,7 +5,7 @@ import {
   availabilityRequests,
   type AvailabilityDTO,
 } from "../../api/availabilities";
-import type { ServiceType } from "../patient/PatientCalendarForm";
+import type { ServiceType } from "./ServiceRequestForm";
 
 interface UpdateAppointmentModalProps {
   isOpen: boolean;
@@ -404,6 +404,10 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
           err?.message ||
           "Failed to update appointment. Please try again."
       );
+    } finally {
+      // Reset loading state in parent component is handled via loading prop
+      // But we ensure modal state is clean
+      setLoadingDates(false);
     }
   };
 
@@ -638,7 +642,7 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
             Cancel
           </Button>
           <Button
-            variant="primary"
+            className="btn-light-teal"
             type="submit"
             disabled={
               loading ||
@@ -664,3 +668,4 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
 };
 
 export default UpdateAppointmentModal;
+
