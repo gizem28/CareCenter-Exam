@@ -1,3 +1,5 @@
+// login side for pasienter og helsearbeidere
+// giriş sayfası - hasta veya sağlık personeli
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
@@ -28,7 +30,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Check for registration success message
+  // sjekk om bruker akkurat registrerte seg
   useEffect(() => {
     const registered = searchParams.get("registered");
     if (registered === "true") {
@@ -38,14 +40,13 @@ const Login: React.FC = () => {
     }
   }, [searchParams, navigate]);
 
-  // Update login type if query parameter changes
+  // oppdater login type basert på url parameter
   useEffect(() => {
     if (typeParam === "patient") {
       setLoginType("patient");
     } else if (typeParam === "healthcare") {
       setLoginType("healthcare");
     } else {
-      // Default to healthcare if no type specified
       setLoginType("healthcare");
     }
   }, [typeParam]);
@@ -75,13 +76,13 @@ const Login: React.FC = () => {
 
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
-    
+
     const emailError = validateField("email", email);
     if (emailError) errors.email = emailError;
-    
+
     const passwordError = validateField("password", password);
     if (passwordError) errors.password = passwordError;
-    
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -235,9 +236,7 @@ const Login: React.FC = () => {
                 disabled={loading}
               />
               {validationErrors.email && (
-                <div className="invalid-feedback">
-                  {validationErrors.email}
-                </div>
+                <div className="invalid-feedback">{validationErrors.email}</div>
               )}
             </div>
 
@@ -284,7 +283,6 @@ const Login: React.FC = () => {
                 try {
                   navigate("/");
                 } catch (error) {
-                  console.error("Navigation error:", error);
                   window.location.href = "/";
                 }
               }}
@@ -303,7 +301,6 @@ const Login: React.FC = () => {
                   try {
                     navigate("/signup");
                   } catch (error) {
-                    console.error("Navigation error:", error);
                     window.location.href = "/signup";
                   }
                 }}
@@ -323,7 +320,6 @@ const Login: React.FC = () => {
                 try {
                   navigate(`/forgot-password?type=${loginType}`);
                 } catch (error) {
-                  console.error("Navigation error:", error);
                   window.location.href = `/forgot-password?type=${loginType}`;
                 }
               }}

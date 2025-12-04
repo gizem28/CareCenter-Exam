@@ -1,3 +1,5 @@
+// pasient dashboard - viser avtaler og booking
+// hasta paneli - randevularını görür ve yeni randevu alabilir
 import React, { useState, useEffect, useRef } from "react";
 import { Container, Alert, Spinner } from "react-bootstrap";
 import { useAuth } from "../../contexts/AuthContext";
@@ -14,23 +16,22 @@ import ServiceRequestForm, {
 } from "../../components/patient/ServiceRequestForm";
 import ServiceRequestList from "../../components/patient/ServiceRequestList";
 
-// Main dashboard for patients - shows appointments and booking form
 const PatientDashboard: React.FC = () => {
   const { user } = useAuth();
   const [appointments, setAppointments] = useState<AppointmentDTO[]>([]);
   const [patientId, setPatientId] = useState<number | null>(null);
-  const patientIdRef = useRef<number | null>(null); // Ref to track patientId for closures
-  const [loading, setLoading] = useState(false); // Start as false, will be set to true when loading appointments
-  const [loadingPatientId, setLoadingPatientId] = useState(true); // Separate loading state for patient ID
+  const patientIdRef = useRef<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [loadingPatientId, setLoadingPatientId] = useState(true);
   const [error, setError] = useState<string>("");
-  const submittingRef = useRef(false); // Prevent duplicate submissions
+  const submittingRef = useRef(false); // forhindre dobbelt innsending
   const [welcomeMessage, setWelcomeMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState(false);
   const [deleteSuccessMessage, setDeleteSuccessMessage] = useState(false);
   const [updateSuccessMessage, setUpdateSuccessMessage] = useState(false);
   const [calendarRefreshTrigger, setCalendarRefreshTrigger] = useState(0);
 
-  // Get patient ID from API
+  // hent pasient id fra api
   useEffect(() => {
     const fetchPatientId = async () => {
       if (!user?.email) {
@@ -51,20 +52,19 @@ const PatientDashboard: React.FC = () => {
       try {
         setLoadingPatientId(true);
 
-        // Use the optimized GetByEmail endpoint instead of fetching all patients
+        // bruk epost for å hente pasient
         try {
           const patient = await patientRequests.getByEmail(user.email);
 
-          // Handle both camelCase and PascalCase field names
+          // håndter både camelCase og PascalCase
           const patientIdValue = patient.id || (patient as any).Id;
           if (patientIdValue) {
             setPatientId(patientIdValue);
             patientIdRef.current = patientIdValue; // Update ref as well
 
-            setError(""); // Clear any previous errors
-            // Show welcome message
+            setError("");
+            // vis velkomst melding
             setWelcomeMessage(true);
-            // Hide welcome message after 3 seconds
             setTimeout(() => {
               setWelcomeMessage(false);
             }, 3000);
@@ -74,7 +74,7 @@ const PatientDashboard: React.FC = () => {
             );
           }
         } catch (emailError: any) {
-          // If GetByEmail fails (404), fall back to getAll for backward compatibility
+          // hvis epost ikke funker prøv å hente alle
           if (emailError?.response?.status === 404) {
             const patients = await patientRequests.getAll();
             const patient = patients.find((p) => {
@@ -104,7 +104,6 @@ const PatientDashboard: React.FC = () => {
           }
         }
       } catch (err: any) {
-        console.error("Error fetching patient ID:", err);
         setError(
           err?.response?.data?.message ||
             err?.message ||
@@ -118,28 +117,27 @@ const PatientDashboard: React.FC = () => {
     fetchPatientId();
   }, [user]);
 
-  // Load appointments when patientId is available
+  // last avtaler når pasientId er klar
   useEffect(() => {
     if (patientId === null || patientId === 0) {
       return;
     }
 
-    // Load appointments immediately - use the patientId from the dependency
+    // last med en gang
     const loadImmediately = async () => {
       await loadAppointments(patientId);
     };
     loadImmediately();
 
-    // Also retry after a short delay to ensure data is available
-    // This helps with cases where the backend might need a moment to process
+    // prøv igjen etter litt tid
     const retryTimer = setTimeout(async () => {
       await loadAppointments(patientId);
     }, 1000);
 
     return () => clearTimeout(retryTimer);
-  }, [patientId]); // patientId is the only dependency we need
+  }, [patientId]);
 
-  // Load appointments for the current patient
+  // hent avtaler for pasient
   const loadAppointments = async (overridePatientId?: number | null) => {
     const idToUse =
       overridePatientId !== undefined ? overridePatientId : patientId;
@@ -159,10 +157,9 @@ const PatientDashboard: React.FC = () => {
         return;
       }
 
-      // Transform backend Appointment model to AppointmentDTO format
-      // Backend returns Appointment model with PascalCase fields
+      // transformer data fra backend til frontend format
       const transformedAppointments = data.map((apt: any) => {
-        // Handle both camelCase and PascalCase field names
+        // håndter både camelCase og PascalCase
         const availability = apt.availability || apt.Availability;
         const availabilityDate = availability?.date || availability?.Date;
         const availabilityStartTime =
@@ -176,9 +173,8 @@ const PatientDashboard: React.FC = () => {
           availabilityId: apt.availabilityId || apt.AvailabilityId,
           date: availabilityDate,
           createdAt: apt.createdAt || apt.CreatedAt,
-          // Include selected start time from appointment
           selectedStartTime: apt.selectedStartTime || apt.SelectedStartTime,
-          // Include full availability object with normalized field names
+          // availability objekt med normaliserte feltnavn
           availability: availability
             ? {
                 id: availability.id || availability.Id,
@@ -196,9 +192,8 @@ const PatientDashboard: React.FC = () => {
         };
       });
 
-      // Force a state update by using a function to ensure React detects the change
+      // oppdater state med ny data
       setAppointments((prev) => {
-        // Only update if the data actually changed
         if (JSON.stringify(prev) !== JSON.stringify(transformedAppointments)) {
           return transformedAppointments;
         }
@@ -270,8 +265,7 @@ const PatientDashboard: React.FC = () => {
     submittingRef.current = false;
   };
 
-  // Create new appointment by calling API
-  // Dette lager en ny avtale gjennom API-kallet
+  // opprett ny avtale via api
   const createAppointment = async (
     request: {
       serviceType: ServiceType;
@@ -284,12 +278,11 @@ const PatientDashboard: React.FC = () => {
     try {
       setError("");
 
-      // Parse selectedTime string (format: "HH:mm")
+      // parse tid streng til riktig format
       let selectedStartTime: string | undefined;
 
       if (request.selectedTime) {
         selectedStartTime = request.selectedTime.trim();
-        // Convert to TimeSpan format (HH:mm:ss)
         if (selectedStartTime) {
           const startParts = selectedStartTime.split(":");
           if (startParts.length === 2) {
@@ -313,12 +306,11 @@ const PatientDashboard: React.FC = () => {
         setSuccessMessage(false);
       }, 4000);
 
-      // Refresh appointments after a short delay to ensure backend has processed
+      // oppdater liste etter litt tid
       setTimeout(async () => {
         await loadAppointments(finalPatientId);
       }, 500);
 
-      // Also refresh again after a longer delay as a fallback
       setTimeout(async () => {
         await loadAppointments(finalPatientId);
       }, 1500);
@@ -330,7 +322,6 @@ const PatientDashboard: React.FC = () => {
       setError(errorMessage);
       throw err;
     } finally {
-      // Ensure submittingRef is reset even if error occurs
       submittingRef.current = false;
     }
   };
@@ -355,33 +346,31 @@ const PatientDashboard: React.FC = () => {
 
       await appointmentRequests.update(id, updateData);
       await loadAppointments();
-      // Show success message
+      // vis suksess melding
       setUpdateSuccessMessage(true);
       setTimeout(() => {
         setUpdateSuccessMessage(false);
       }, 4000);
     } catch (err: any) {
-      console.error("Error updating appointment:", err);
-      throw err; // Let ServiceRequestList handle the error display
+      throw err;
     } finally {
-      // Reset loading state is handled in ServiceRequestList
-      // But ensure error state is available
       setLoading(false);
     }
   };
 
+  // slett avtale - sjekk at den ikke er i fortid
   const handleDelete = async (id: number) => {
     try {
       setError("");
 
-      // Find the appointment to check its date
+      // finn avtale
       const appointment = appointments.find((apt) => apt.id === id);
       if (!appointment) {
         setError("Appointment not found.");
         return;
       }
 
-      // Get the appointment date
+      // hent dato for avtale
       const appointmentDate =
         appointment.date || appointment.availability?.date;
       if (!appointmentDate) {
@@ -389,7 +378,7 @@ const PatientDashboard: React.FC = () => {
         return;
       }
 
-      // Check if appointment is in the past or same day
+      // sjekk om avtale er i fortid eller samme dag
       const appointmentDateObj = new Date(appointmentDate);
       const today = new Date();
       today.setHours(0, 0, 0, 0); // Reset time to start of day
@@ -408,36 +397,30 @@ const PatientDashboard: React.FC = () => {
       await appointmentRequests.delete(id, "Client");
       await loadAppointments();
 
-      // Trigger calendar refresh by updating existingAppointments
-      // This will cause the calendar to reload available dates
+      // oppdater kalender
       setCalendarRefreshTrigger((prev) => prev + 1);
 
-      // Show success message
       setDeleteSuccessMessage(true);
       setTimeout(() => {
         setDeleteSuccessMessage(false);
       }, 4000);
     } catch (err: any) {
-      console.error("Error deleting appointment:", err);
       const errorMessage =
         err?.response?.data?.message ||
         err?.message ||
         "Failed to delete appointment.";
       setError(errorMessage);
-      throw err; // Let ServiceRequestList handle the error display
+      throw err;
     } finally {
-      // Reset loading state
       setLoading(false);
     }
   };
 
   const handleCancelForm = () => {
-    // Form cancelled - no action needed
-    // Clear any errors
     setError("");
   };
 
-  // Show loading only if we're still fetching patient ID
+  // vis loading spinner
   if (loadingPatientId) {
     return (
       <div className="d-flex flex-column justify-content-center align-items-center min-vh-custom">

@@ -3,36 +3,35 @@ import { Modal, Button, Form, Alert } from "react-bootstrap";
 import type { AvailabilityDTO } from "../../api/availabilities";
 import UnifiedCalendar from "../shared/UnifiedCalendar";
 
-// Props interface for the availability form modal
-// This defines all the data and functions the component needs
+// modal for worker to add or edit availability
+// brukes når helsearbeider skal legge til ledige tider
 interface AvailabilityFormModalProps {
-  isOpen: boolean; // if modal is showing
-  editingAvailability: AvailabilityDTO | null; // when editing existing availability
-  availabilityMode: "single" | "range" | "weekly"; // different modes for adding availability
-  singleDate: string; // date for single mode
-  startDate: string; // start date for range mode
-  endDate: string; // end date for range mode
-  selectedDays: number[]; // which days are selected for weekly mode
-  startTime: string; // begining time
-  endTime: string; // ending time
-  skipWeekends: boolean; // option to skip weekend days
-  existingAvailabilities?: AvailabilityDTO[]; // existing availabilities to show on calendar
-  errorMessage?: string; // error message to display in modal
-  hasValidationErrors?: boolean; // whether the form has validation errors
-  onSetErrorMessage?: (message: string) => void; // function to set error message
-  onClose: () => void; // function to close the modal
-  onModeChange: (mode: "single" | "range" | "weekly") => void; // change mode
-  onSingleDateChange: (date: string) => void; // update single date
-  onStartDateChange: (date: string) => void; // update start date
-  onEndDateChange: (date: string) => void; // update end date
-  onDayToggle: (day: number) => void; // toggle day selection
-  onStartTimeChange: (time: string) => void; // change start time
-  onEndTimeChange: (time: string) => void; // change end time
-  onSkipWeekendsChange: (skip: boolean) => void; // toggle weekend skip
-  onSubmit: (e: React.FormEvent) => void; // submit the form
+  isOpen: boolean;
+  editingAvailability: AvailabilityDTO | null;
+  availabilityMode: "single" | "range" | "weekly";
+  singleDate: string;
+  startDate: string;
+  endDate: string;
+  selectedDays: number[];
+  startTime: string;
+  endTime: string;
+  skipWeekends: boolean;
+  existingAvailabilities?: AvailabilityDTO[];
+  errorMessage?: string;
+  hasValidationErrors?: boolean;
+  onSetErrorMessage?: (message: string) => void;
+  onClose: () => void;
+  onModeChange: (mode: "single" | "range" | "weekly") => void;
+  onSingleDateChange: (date: string) => void;
+  onStartDateChange: (date: string) => void;
+  onEndDateChange: (date: string) => void;
+  onDayToggle: (day: number) => void;
+  onStartTimeChange: (time: string) => void;
+  onEndTimeChange: (time: string) => void;
+  onSkipWeekendsChange: (skip: boolean) => void;
+  onSubmit: (e: React.FormEvent) => void;
 }
 
-// Main component for the availability form modal
 const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
   isOpen,
   editingAvailability,
@@ -59,10 +58,10 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
   onSkipWeekendsChange,
   onSubmit,
 }) => {
-  // Don't render anything if modal is not open - performance optimization
+  // dont show if closed
   if (!isOpen) return null;
 
-  // Helper function to check if date is within 30 days from today
+  // sjekk om dato er innen 30 dager
   const isWithin30Days = (date: Date): boolean => {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset time to start of day
@@ -73,15 +72,14 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
     return checkDate >= today && checkDate <= maxDate;
   };
 
-  // Day names for the weekly selection - short form for space
+  // dag navn for ukentlig valg
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  // Validate dates whenever they change (only for date validation errors, not backend errors)
+  // validerer datoer når de endres
   useEffect(() => {
     if (!onSetErrorMessage) return;
 
-    // Only validate if there's no existing error message (to avoid clearing backend errors)
-    // We'll check if current error is a date validation error
+    // bare valider hvis ingen feilmelding allerede
     const isDateValidationError = errorMessage?.includes("30 days from today");
 
     if (availabilityMode === "single" && singleDate) {
@@ -91,7 +89,6 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
           "Availability can only be added up to 30 days from today."
         );
       } else if (isDateValidationError) {
-        // Only clear if it was a date validation error
         onSetErrorMessage("");
       }
     } else if (availabilityMode === "range" && startDate && endDate) {
@@ -102,7 +99,6 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
           "Availability can only be added up to 30 days from today."
         );
       } else if (isDateValidationError) {
-        // Only clear if it was a date validation error
         onSetErrorMessage("");
       }
     } else if (availabilityMode === "weekly" && startDate && endDate) {
@@ -113,11 +109,9 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
           "Availability can only be added up to 30 days from today."
         );
       } else if (isDateValidationError) {
-        // Only clear if it was a date validation error
         onSetErrorMessage("");
       }
     } else if (isDateValidationError) {
-      // Clear error if no dates selected and it was a date validation error
       onSetErrorMessage("");
     }
   }, [
@@ -129,7 +123,7 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
     errorMessage,
   ]);
 
-  // Main modal structure using Bootstrap Modal
+  // bootstrap modal for å vise form
   return (
     <Modal show={isOpen} onHide={onClose} centered>
       <Modal.Header closeButton>
@@ -139,16 +133,15 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
       </Modal.Header>
 
       <Modal.Body>
-        {/* Error message display */}
+        {/* feilmelding hvis noe gikk galt */}
         {errorMessage && (
           <Alert variant="danger" className="mb-2 small py-2">
             {errorMessage}
           </Alert>
         )}
-        {/* Main form for availability input */}
-        {/* Submit event is handled by the onSubmit prop from parent */}
+        {/* form for availability input */}
         <Form id="availability-form" onSubmit={onSubmit}>
-          {/* Only show mode selection when adding new, not editing */}
+          {/* vis modus valg bare når ny, ikke redigering */}
           {!editingAvailability && (
             <div className="mb-3">
               <label className="form-label small fw-semibold">
@@ -199,14 +192,13 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
                 <UnifiedCalendar
                   availabilities={existingAvailabilities}
                   onDateClick={(date) => {
-                    // Validate date is within 30 days
+                    // valider at dato er innen 30 dager
                     if (!isWithin30Days(date)) {
                       onSetErrorMessage?.(
                         "Availability can only be added up to 30 days from today."
                       );
                       return;
                     }
-                    // Clear any previous error message
                     onSetErrorMessage?.("");
                     const year = date.getFullYear();
                     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -248,7 +240,7 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
                       };
 
                       if (Array.isArray(value) && value.length === 2) {
-                        // Validate both dates are within 30 days
+                        // begge datoer må være innen 30 dager
                         if (
                           !isWithin30Days(value[0]) ||
                           !isWithin30Days(value[1])
@@ -258,31 +250,25 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
                           );
                           return;
                         }
-                        // Clear any previous error message
                         onSetErrorMessage?.("");
-                        // React-calendar returns exact inclusive dates [start, end]
                         const startDateStr = formatDate(value[0]);
                         const endDateStr = formatDate(value[1]);
                         onStartDateChange(startDateStr);
                         onEndDateChange(endDateStr);
                       } else if (value instanceof Date) {
-                        // Validate date is within 30 days
                         if (!isWithin30Days(value)) {
                           onSetErrorMessage?.(
                             "Availability can only be added up to 30 days from today."
                           );
                           return;
                         }
-                        // Clear any previous error message
                         onSetErrorMessage?.("");
-                        // Handle single date selection (if user clicks instead of dragging)
+                        // håndter enkelt dato klikk
                         const dateStr = formatDate(value);
                         if (!startDate || (startDate && endDate)) {
-                          // Start new range if no start date or both dates are already set
                           onStartDateChange(dateStr);
                           onEndDateChange("");
                         } else if (startDate && !endDate) {
-                          // Set end date if start date exists but no end date
                           onEndDateChange(dateStr);
                         }
                       }
@@ -348,7 +334,7 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
             )}
           </div>
 
-          {/* Time selection section - optional start and end times */}
+          {/* tid valg - valgfritt */}
           <div className="row g-3 mt-2">
             <div className="col-md-6">
               <Form.Label className="small fw-semibold">
@@ -371,8 +357,6 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
               />
             </div>
           </div>
-
-          {/* Action buttons at bottom of form */}
         </Form>
       </Modal.Body>
 

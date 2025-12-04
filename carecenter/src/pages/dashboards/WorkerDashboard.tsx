@@ -1,3 +1,5 @@
+// dashboard for helsearbeider
+// sağlık çalışanı paneli - müsaitlik ve randevuları yönetir
 import React, { useState, useEffect } from "react";
 import { Alert } from "react-bootstrap";
 import { useAuth } from "../../contexts/AuthContext";
@@ -17,7 +19,6 @@ import AppointmentTable from "../../components/worker/AppointmentTable";
 import AppointmentDetailsModal from "../../components/shared/AppointmentDetailsModal";
 import "../../css/Worker.css";
 
-// Main dashboard for healthcare workers to manage availability and appointments
 const WorkerDashboard: React.FC = () => {
   const { user } = useAuth();
   const [workerId, setWorkerId] = useState<number | null>(null);
@@ -65,7 +66,7 @@ const WorkerDashboard: React.FC = () => {
     setSelectedCalendarAvailability(null);
   }, [viewMode]);
 
-  // Load initial worker information and data
+  // hent arbeider info og data
   const loadWorkerData = async () => {
     if (!user?.email) return;
     try {
@@ -88,20 +89,22 @@ const WorkerDashboard: React.FC = () => {
     }
   };
 
+  // hent tilgjengeligheter for arbeider
   const loadAvailabilities = async (id: number) => {
     try {
       const workerAvailabilities = await availabilityRequests.getByWorker(id);
       setAvailabilities(workerAvailabilities);
     } catch (err: any) {
-      console.error("Failed to load availabilities:", err);
+      setError("Failed to load availabilities");
     }
   };
 
+  // hent avtaler for arbeider
   const loadAppointments = async (id: number) => {
     try {
       const data = await appointmentRequests.getByWorker(id);
       const mappedAppointments: AppointmentDTO[] = data.map((item) => {
-        // Format display time from selectedStartTime
+        // formater tid fra selectedStartTime
         let appointmentTime = "";
         if (item.selectedStartTime) {
           appointmentTime = formatTime(item.selectedStartTime);
@@ -115,11 +118,11 @@ const WorkerDashboard: React.FC = () => {
       });
       setAppointments(mappedAppointments);
     } catch (err: any) {
-      console.error("Failed to load appointments:", err);
+      setError("Failed to load appointments");
     }
   };
 
-  // Helper function to check if date is within 30 days from today
+  // sjekk om dato er innen 30 dager
   const isWithin30Days = (dateStr: string): boolean => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -369,7 +372,7 @@ const WorkerDashboard: React.FC = () => {
         const patient = await patientRequests.getById(appointment.patientId);
         setPatientInfo(patient);
       } catch (err: any) {
-        console.error("Failed to load patient information:", err);
+        // feilet å laste pasient info
       } finally {
         setLoadingPatient(false);
       }

@@ -1,3 +1,5 @@
+// main app component - ruter for hele appen
+// burada tüm sayfalar tanimli
 import {
   BrowserRouter as Router,
   Routes,
@@ -23,6 +25,7 @@ import WorkersList from "./pages/workers/WorkersList";
 import ServiceRequestsApproval from "./pages/admin/ServiceRequestsApproval";
 import "./App.css";
 
+// inner component with routes
 function AppContent() {
   return (
     <div className="app-layout">
@@ -33,6 +36,7 @@ function AppContent() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          {/* admin sayfalar - sadece admin görebilir */}
           <Route
             path="/admin/dashboard"
             element={
@@ -97,6 +101,7 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          {/* helsearbeider dashboard */}
           <Route
             path="/healthcare/dashboard"
             element={
@@ -105,6 +110,7 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          {/* pasient dashboard */}
           <Route
             path="/patient/dashboard"
             element={
@@ -113,6 +119,7 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          {/* redirect til hjem hvis side ikke finnes */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

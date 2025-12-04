@@ -1,3 +1,4 @@
+// tabell for å vise avtaler til helsearbeider
 import React, { useState, useEffect } from "react";
 import { Table, Badge, Button } from "react-bootstrap";
 import type { AppointmentDTO } from "../../api/appointments";
@@ -49,7 +50,6 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
             const patient = await patientRequests.getById(patientId);
             return { id: patientId, name: patient.fullName };
           } catch (error) {
-            console.error(`Failed to fetch patient ${patientId}:`, error);
             return { id: patientId, name: `Patient #${patientId}` };
           }
         });
@@ -62,7 +62,7 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
 
         setPatientNames((prev) => ({ ...prev, ...newPatientNames }));
       } catch (error) {
-        console.error("Failed to fetch patient names:", error);
+        // feilet å hente pasient navn
       } finally {
         setLoadingPatients((prev) => {
           const newSet = new Set(prev);

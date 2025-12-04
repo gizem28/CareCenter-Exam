@@ -1,3 +1,5 @@
+// admin dashboard - oversikt over alle pasienter, arbeidere og avtaler
+// yönetici paneli - tüm hastalar, çalışanlar ve randevular
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
@@ -162,7 +164,7 @@ const ManagerDashboard: React.FC = () => {
         const patient = await patientRequests.getById(appointment.patientId);
         setPatientInfo(patient);
       } catch (err: any) {
-        console.error("Failed to load patient information:", err);
+        // feilet å laste pasient info
       } finally {
         setLoadingPatient(false);
       }

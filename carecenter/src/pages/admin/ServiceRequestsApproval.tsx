@@ -195,7 +195,6 @@ const ServiceRequestsApproval: React.FC = () => {
       }
       return timeStr;
     } catch (err) {
-      console.warn("Error formatting time:", timeString, err);
       return String(timeString || "N/A");
     }
   };

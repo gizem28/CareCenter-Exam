@@ -1,3 +1,5 @@
+// auth context for hele appen
+// kullanıcı giriş durumunu tutar
 import React, {
   createContext,
   useContext,
@@ -6,6 +8,7 @@ import React, {
   type ReactNode,
 } from "react";
 import { AuthService } from "../api/authService";
+
 interface User {
   email: string;
   fullName: string;
@@ -21,7 +24,6 @@ interface AuthContextType {
   isLoading: boolean;
 }
 
-// React context for authentication state management
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
@@ -36,31 +38,29 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-// React provider component that wraps the app with auth context
+// provider for auth - wrapper rundt hele appen
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored token on mount
+    // sjekk localstorage for token når app starter
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
 
     if (storedToken && storedUser) {
       try {
         const userData = JSON.parse(storedUser);
-        // Validate that user data has required fields
         if (userData && userData.email && userData.role) {
           setToken(storedToken);
           setUser(userData);
         } else {
-          // Clear invalid data
+          // slett ugyldig data
           localStorage.removeItem("token");
           localStorage.removeItem("user");
         }
       } catch (error) {
-        // Clear invalid data if parsing fails
         localStorage.removeItem("token");
         localStorage.removeItem("user");
       }
@@ -68,7 +68,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(false);
   }, []);
 
-  // Login function - calls API and stores token
+  // login funksjon - kaller api og lagrer token
   const login = async (email: string, password: string): Promise<void> => {
     try {
       const response = await AuthService.login(email, password);
@@ -88,7 +88,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Login out is easy we just clear the token adn user data from local storage
+  // logg ut - fjern token og bruker fra localstorage
   const logout = () => {
     setToken(null);
     setUser(null);

@@ -326,11 +326,7 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
             }
           }
         } catch (err) {
-          // If we can't fetch the current availability, just use unbooked ones
-          console.warn(
-            "Could not fetch current appointment availability:",
-            err
-          );
+          // hvis vi ikke kan hente nåværende tilgjengelighet, bruk ledige
         }
       }
 
@@ -668,4 +664,3 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
 };
 
 export default UpdateAppointmentModal;
-
