@@ -144,21 +144,21 @@ if (app.Environment.IsDevelopment())
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AuthUser>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        var scopedLogger  = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
         try
         {
             // Create database and tables if they don't exist
            
             await dbContext.Database.EnsureCreatedAsync();
-            logger.LogInformation("Database tables created successfully from DbContext models");
+            scopedLogger.LogInformation("Database tables created successfully from DbContext models");
 
             // Seed test users and sample data
             await SeedTestUsersAsync(userManager, roleManager, dbContext);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error initializing database");
+            scopedLogger.LogError(ex, "Error initializing database");
             throw;
         }
     }

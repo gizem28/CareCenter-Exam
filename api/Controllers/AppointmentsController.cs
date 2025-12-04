@@ -194,6 +194,7 @@ public async Task<IActionResult> GetByPatient(int patientId)
                 {
                     a.Id,
                     a.Status,
+                 a.ServiceType,
                     a.PatientId,
                     PatientName = patients.ContainsKey(a.PatientId) ? patients[a.PatientId].FullName : "Unknown",
                     PatientEmail = patients.ContainsKey(a.PatientId) ? patients[a.PatientId].Email : "",
@@ -206,7 +207,6 @@ public async Task<IActionResult> GetByPatient(int patientId)
                     EndTime = FormatTimeSpan(a.SelectedEndTime ?? a.Availability?.EndTime),
                     SelectedStartTime = FormatTimeSpan(a.SelectedStartTime),
                     SelectedEndTime = FormatTimeSpan(a.SelectedEndTime),
-                    Tasks = a.Tasks?.Select(t => t.Description) ?? Enumerable.Empty<string>(),
                     a.VisitNote,
                     a.CreatedAt,
                     AvailabilityId = a.AvailabilityId,
