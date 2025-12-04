@@ -46,13 +46,19 @@ namespace CareCenter.Controllers
 
            
                 if (!await _roleManager.RoleExistsAsync(dto.Role))
+                {
+                    _logger.LogInformation("Role {Role} does not exist. Creating role.", dto.Role);
                     await _roleManager.CreateAsync(new IdentityRole(dto.Role));
+                }
 
              
                 var existingUser = await _userManager.FindByEmailAsync(dto.Email);
                 if (existingUser != null)
+                {
+                    _logger.LogWarning("Registration attempt with already registered email: {Email}", dto.Email);
                     return Conflict(new { message = "Email is already registered" });
-
+                }
+                
           
                 var user = new AuthUser
                 {
@@ -65,6 +71,7 @@ namespace CareCenter.Controllers
 
                 var result = await _userManager.CreateAsync(user, dto.Password);
                 if (!result.Succeeded)
+
                     return BadRequest(new { message = "Registration failed", errors = result.Errors });
 
                 await _userManager.AddToRoleAsync(user, dto.Role);
@@ -89,7 +96,11 @@ namespace CareCenter.Controllers
         
                 var existingUser = await _userManager.FindByEmailAsync(dto.Email);
                 if (existingUser != null)
+                {
+                    _logger.LogWarning("Patient registration attempt with already registered email: {Email}", dto.Email);
                     return Conflict(new { message = "Email is already registered" });
+                }
+                    
 
           
                 if (!await _roleManager.RoleExistsAsync("Patient"))
@@ -107,7 +118,11 @@ namespace CareCenter.Controllers
 
                 var createResult = await _userManager.CreateAsync(user, dto.Password);
                 if (!createResult.Succeeded)
+                {
+                    _logger.LogWarning("Patient registration failed for email: {Email}", dto.Email);
                     return BadRequest(new { message = "Registration failed", errors = createResult.Errors });
+                }
+                    
 
                 await _userManager.AddToRoleAsync(user, "Patient");
 
@@ -115,7 +130,7 @@ namespace CareCenter.Controllers
                 var existingPatient = await _patientRepository.GetByEmailAsync(dto.Email);
                 if (existingPatient != null)
                 {
-      
+                    _logger.LogInformation("Patient account already exists for email: {Email}", dto.Email);
                     return Ok(new { message = "Patient account already exists. Please login instead." });
                 }
 
@@ -124,6 +139,7 @@ namespace CareCenter.Controllers
                 {
             
                     await _userManager.DeleteAsync(user);
+                    _logger.LogWarning("Invalid birth date format provided for patient registration: {BirthDate}", dto.BirthDate);
                     return BadRequest(new { message = "Invalid birth date format" });
                 }
 
@@ -152,7 +168,7 @@ namespace CareCenter.Controllers
                 {
                     await _userManager.DeleteAsync(user);
                 }
-                
+                _logger.LogError(ex, "Error occurred during patient registration for email: {Email}", dto.Email);
                 return StatusCode(500, new { message = "An error occurred while registering patient", error = ex.Message });
             }
         }

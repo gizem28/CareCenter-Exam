@@ -9,10 +9,12 @@ namespace CareCenter.Controllers
     public class AvailabilitiesController : ControllerBase
     {
         private readonly IAvailabilityRepository _repo;
+        private readonly ILogger<AvailabilitiesController> _logger;
 
-        public AvailabilitiesController(IAvailabilityRepository repo)
+        public AvailabilitiesController(IAvailabilityRepository repo, ILogger<AvailabilitiesController> logger)
         {
             _repo = repo;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -25,6 +27,7 @@ namespace CareCenter.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error retrieving availabilities");
                 return StatusCode(500, new { message = "Error retrieving availabilities", detail = ex.Message });
             }
         }
@@ -43,6 +46,7 @@ namespace CareCenter.Controllers
                 {
                     if (!dto.Date.HasValue)
                     {
+                        _logger.LogWarning("Date is required for availability");
                         errors.Add(new { date = dto.Date, error = "Date is required." });
                         continue;
                     }
@@ -52,10 +56,12 @@ namespace CareCenter.Controllers
                 }
                 catch (InvalidOperationException ex)
                 {
+                    _logger.LogWarning(ex, "Invalid operation while adding availability for date: {Date}", dto.Date);
                     errors.Add(new { date = dto.Date, error = ex.Message });
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError(ex, "Error while adding availability for date: {Date}", dto.Date);
                     errors.Add(new { date = dto.Date, error = $"Error: {ex.Message}" });
                 }
             }
@@ -87,10 +93,12 @@ namespace CareCenter.Controllers
             }
             catch (InvalidOperationException ex)
             {
+                _logger.LogWarning(ex, "Invalid operation while updating availability with id: {Id}", id);
                 return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error updating availability with id: {Id}", id);
                 return StatusCode(500, new { message = "Error updating availability", detail = ex.Message });
             }
         }
@@ -103,10 +111,12 @@ namespace CareCenter.Controllers
                 if (!deleted)
                     return NotFound(new { message = $"Availability with id {id} not found." });
 
+                _logger.LogInformation("Availability with id {Id} deleted successfully.", id);
                 return Ok(new { message = $"Availability with id {id} deleted successfully." });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error deleting availability with id: {Id}", id);
                 return StatusCode(500, new { message = "Error deleting availability", detail = ex.Message });
             }
         }
@@ -121,6 +131,7 @@ namespace CareCenter.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error retrieving unbooked availabilities");
                 return StatusCode(500, new { message = "Error retrieving unbooked availabilities", detail = ex.Message });
             }
         }
@@ -135,6 +146,7 @@ namespace CareCenter.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error retrieving worker availabilities");
                 return StatusCode(500, new { message = "Error retrieving worker availabilities", detail = ex.Message });
             }
         }

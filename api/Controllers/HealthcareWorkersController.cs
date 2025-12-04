@@ -39,6 +39,7 @@ namespace CareCenter.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error retrieving healthcare workers");
                 return StatusCode(500, new { message = "An error occurred while retrieving healthcare workers.", detail = ex.Message });
             }
         }
@@ -57,6 +58,7 @@ namespace CareCenter.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error retrieving healthcare worker with ID {Id}", id);
                 return StatusCode(500, new { message = "An error occurred while retrieving the healthcare worker.", detail = ex.Message });
             }
         }
@@ -75,6 +77,7 @@ namespace CareCenter.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error retrieving healthcare worker with email {Email}", email);
                 return StatusCode(500, new { message = "An error occurred while retrieving the healthcare worker.", detail = ex.Message });
             }
         }
@@ -128,6 +131,7 @@ namespace CareCenter.Controllers
                     var createResult = await _userManager.CreateAsync(authUser, password!);
                     if (!createResult.Succeeded)
                     {
+                        _logger.LogError("Failed to create authentication account for worker {Email}. Errors: {Errors}", dto.Email, createResult.Errors.Select(e => e.Description));
                         return BadRequest(new { message = "Failed to create authentication account", errors = createResult.Errors.Select(e => e.Description) });
                     }
 
@@ -159,14 +163,17 @@ namespace CareCenter.Controllers
             }
             catch (InvalidOperationException ex)
             {
+                _logger.LogWarning(ex, "Invalid operation while creating healthcare worker.");
                 return BadRequest(new { message = ex.Message });
             }
             catch (DbUpdateException ex)
             {
+                _logger.LogError(ex, "Database update error while creating healthcare worker.");
                 return StatusCode(409, new { message = "Database update error while creating healthcare worker.", detail = ex.Message });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while creating healthcare worker.");
                 return StatusCode(500, new { message = "An error occurred while creating healthcare worker.", detail = ex.Message });
             }
         }
@@ -191,10 +198,12 @@ namespace CareCenter.Controllers
             }
             catch (DbUpdateException ex)
             {
+                _logger.LogError(ex, "Database update error while updating healthcare worker with ID {Id}.", id);
                 return StatusCode(409, new { message = "Database update error while updating healthcare worker.", detail = ex.Message });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while updating healthcare worker with ID {Id}.", id);
                 return StatusCode(500, new { message = "An error occurred while updating healthcare worker.", detail = ex.Message });
             }
         }
@@ -213,10 +222,12 @@ namespace CareCenter.Controllers
             }
             catch (DbUpdateException ex)
             {
+                _logger.LogError(ex, "Database update error while deleting healthcare worker with ID {Id}.", id);
                 return StatusCode(409, new { message = "Cannot delete healthcare worker due to related data.", detail = ex.Message });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while deleting healthcare worker with ID {Id}.", id);
                 return StatusCode(500, new { message = "An error occurred while deleting healthcare worker.", detail = ex.Message });
             }
         }
