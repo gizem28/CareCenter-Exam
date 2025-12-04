@@ -58,9 +58,6 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
   onSkipWeekendsChange,
   onSubmit,
 }) => {
-  // dont show if closed
-  if (!isOpen) return null;
-
   // sjekk om dato er innen 30 dager
   const isWithin30Days = (date: Date): boolean => {
     const today = new Date();
@@ -75,9 +72,9 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
   // dag navn for ukentlig valg
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  // validerer datoer når de endres
+  // validerer datoer når de endres - hook must be called unconditionally
   useEffect(() => {
-    if (!onSetErrorMessage) return;
+    if (!isOpen || !onSetErrorMessage) return;
 
     // bare valider hvis ingen feilmelding allerede
     const isDateValidationError = errorMessage?.includes("30 days from today");
@@ -115,6 +112,7 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
       onSetErrorMessage("");
     }
   }, [
+    isOpen,
     singleDate,
     startDate,
     endDate,
@@ -122,6 +120,9 @@ const AvailabilityFormModal: React.FC<AvailabilityFormModalProps> = ({
     onSetErrorMessage,
     errorMessage,
   ]);
+
+  // dont show if closed - must be after all hooks
+  if (!isOpen) return null;
 
   // bootstrap modal for å vise form
   return (
