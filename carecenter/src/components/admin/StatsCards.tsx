@@ -23,6 +23,16 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
             </div>
             <div className="d-grid gap-2 mt-auto">
               <a
+                href="/patients/create"
+                className="btn btn-outline-success"
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                  e.preventDefault();
+                  navigate("/patients/create");
+                }}
+              >
+                <i className="bi bi-person-plus"></i> Register Patient
+              </a>
+              <a
                 href="/patients"
                 className="btn btn-outline-success"
                 onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -30,7 +40,7 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
                   navigate("/patients");
                 }}
               >
-                <i className="bi bi-list"></i> Manage Patients
+                <i className="bi bi-people"></i> View All Patients
               </a>
             </div>
           </div>
