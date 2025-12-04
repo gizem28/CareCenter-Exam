@@ -61,6 +61,14 @@ function AppContent() {
           }
         />
         <Route
+          path="/patients/create"
+          element={
+            <ProtectedRoute requiredRole="Admin">
+              <SignUp />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/patients/:id"
           element={
             <ProtectedRoute requiredRole="Admin">

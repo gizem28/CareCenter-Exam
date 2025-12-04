@@ -1,10 +1,15 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import { AuthService } from "../../api/authService";
 import "../../css/Login.css";
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+  const isAdminCreating =
+    location.pathname === "/patients/create" || user?.role === "Admin";
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [validationErrors, setValidationErrors] = useState<
@@ -122,8 +127,12 @@ const SignUp: React.FC = () => {
       };
 
       await AuthService.registerPatient(sanitizedData);
-      // Redirect to login page with success message
-      navigate("/login?type=patient&registered=true");
+      // Redirect based on context: admin creating patient goes to patients list, regular signup goes to login
+      if (isAdminCreating) {
+        navigate("/patients");
+      } else {
+        navigate("/login?type=patient&registered=true");
+      }
     } catch (err: any) {
       const errorMessage =
         err?.message || "Failed to create account. Please try again.";
@@ -369,32 +378,45 @@ const SignUp: React.FC = () => {
                 </>
               )}
             </button>
-            <a
-              className="btn btn-outline-secondary ms-2"
-              href="/login?type=patient"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate("/login?type=patient");
-              }}
-            >
-              Back to Login
-            </a>
-          </form>
-
-          <div className="mt-3 text-center">
-            <p className="text-muted small">
-              Already have an account?{" "}
+            {!isAdminCreating && (
               <a
+                className="btn btn-outline-secondary ms-2"
                 href="/login?type=patient"
                 onClick={(e) => {
                   e.preventDefault();
                   navigate("/login?type=patient");
                 }}
               >
-                Sign in here
+                Back to Login
               </a>
-            </p>
-          </div>
+            )}
+            {isAdminCreating && (
+              <button
+                type="button"
+                className="btn btn-outline-secondary ms-2"
+                onClick={() => navigate("/patients")}
+              >
+                Cancel
+              </button>
+            )}
+          </form>
+
+          {!isAdminCreating && (
+            <div className="mt-3 text-center">
+              <p className="text-muted small">
+                Already have an account?{" "}
+                <a
+                  href="/login?type=patient"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate("/login?type=patient");
+                  }}
+                >
+                  Sign in here
+                </a>
+              </p>
+            </div>
+          )}
         </div>
       </section>
     </main>

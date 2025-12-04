@@ -5,11 +5,7 @@ import type { PatientDTO } from "../../api/patients";
 
 interface AppointmentDetailsModalProps {
   isOpen: boolean;
-  appointment:
-    | (AppointmentDTO & {
-        tasks?: Array<{ description: string; done: boolean }>;
-      })
-    | null;
+  appointment: AppointmentDTO | null;
   patientInfo: PatientDTO | null;
   loadingPatient: boolean;
   onClose: () => void;
@@ -89,7 +85,7 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
           <div className="row">
             <div className="col-sm-6">
               <p>
-                <strong>Date:</strong> {formatDate(appointment.appointmentDate)}
+                <strong>Date:</strong> {formatDate(appointment.date)}
               </p>
             </div>
             {appointment.appointmentTime && (
@@ -106,15 +102,6 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
           <p>
             <strong>Patient ID:</strong> {appointment.patientId}
           </p>
-
-          {appointment.notes && (
-            <div className="mb-3">
-              <strong>Notes:</strong>
-              <div className="mt-2 p-3 bg-light rounded">
-                {appointment.notes}
-              </div>
-            </div>
-          )}
 
           {appointment.serviceType && (
             <p>

@@ -4,9 +4,7 @@ import type { AppointmentDTO } from "../../api/appointments";
 import { patientRequests } from "../../api/patients";
 
 interface AppointmentTableProps {
-  appointments: (AppointmentDTO & {
-    tasks?: Array<{ description: string; done: boolean }>;
-  })[];
+  appointments: AppointmentDTO[];
   onView: (appointment: AppointmentDTO) => void;
   formatDate: (dateString?: string | null) => string;
   formatTime: (timeString?: string | null) => string;
@@ -110,12 +108,12 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({
           {appointments
             .sort(
               (a, b) =>
-                new Date(b.appointmentDate || 0).getTime() -
-                new Date(a.appointmentDate || 0).getTime()
+                new Date(b.date || 0).getTime() -
+                new Date(a.date || 0).getTime()
             )
             .map((appointment) => (
               <tr key={appointment.id}>
-                <td>{formatDate(appointment.appointmentDate)}</td>
+                <td>{formatDate(appointment.date)}</td>
                 <td>{formatTime(appointment.appointmentTime)}</td>
                 <td>
                   <Badge bg={getStatusBadge(appointment.status)}>
