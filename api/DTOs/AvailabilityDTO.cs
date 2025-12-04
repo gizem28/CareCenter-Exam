@@ -13,14 +13,12 @@ namespace CareCenter.DTOs
         [DataType(DataType.Date)]
         public DateTime? Date { get; set; }
 
-        // Time slots (optional - null means all day)
         public TimeSpan? StartTime { get; set; }
         public TimeSpan? EndTime { get; set; }
 
         // Status
         public bool IsBooked { get; set; }
 
-        // Worker information (optional - included in unbooked queries for patient views)
         public string? HealthcareWorkerName { get; set; }
         public string? HealthcareWorkerPosition { get; set; }
     }
