@@ -74,18 +74,25 @@ const UnifiedCalendar: React.FC<UnifiedCalendarProps> = ({
         const classes: string[] = [];
         const dateStr = formatDateToLocalString(date);
 
-        // Check for approved appointments (priority)
+        // Check for appointments by status (priority)
         if (showApproved && appointments.length > 0) {
-          const hasApprovedAppointment = appointments.some((apt) => {
+          const appointmentOnDate = appointments.find((apt) => {
             const aptDate = apt.date || apt.availability?.date;
             if (!aptDate) return false;
             // Use split to avoid timezone conversion issues
             const aptDateStr = String(aptDate).split("T")[0];
             return aptDateStr === dateStr;
           });
-          if (hasApprovedAppointment) {
-            classes.push("approved-appointment-date");
-            return classes.join(" ");
+
+          if (appointmentOnDate) {
+            const status = (appointmentOnDate.status || "").toLowerCase();
+            if (status === "approved") {
+              classes.push("approved-appointment-date");
+              return classes.join(" ");
+            } else if (status === "pending") {
+              classes.push("pending-appointment-date");
+              return classes.join(" ");
+            }
           }
         }
 
@@ -134,23 +141,32 @@ const UnifiedCalendar: React.FC<UnifiedCalendarProps> = ({
       if (view === "month") {
         const dateStr = formatDateToLocalString(date);
 
-        // Check for approved appointments (priority)
+        // Check for appointments by status (priority)
         if (showApproved && appointments.length > 0) {
-          const hasApprovedAppointment = appointments.some((apt) => {
+          const appointmentOnDate = appointments.find((apt) => {
             const aptDate = apt.date || apt.availability?.date;
             if (!aptDate) return false;
             // Use split to avoid timezone conversion issues
             const aptDateStr = String(aptDate).split("T")[0];
             return aptDateStr === dateStr;
           });
-          if (hasApprovedAppointment) {
+
+          if (appointmentOnDate) {
+            const status = (appointmentOnDate.status || "").toLowerCase();
+            let color = "#3b82f6"; // Default blue for approved
+            if (status === "approved") {
+              color = "#3b82f6"; // Blue for approved
+            } else if (status === "pending") {
+              color = "#f59e0b"; // Orange/yellow for pending
+            }
+
             return (
               <div
                 style={{
                   width: `${dotSize}px`,
                   height: `${dotSize}px`,
                   borderRadius: "50%",
-                  backgroundColor: "#3b82f6",
+                  backgroundColor: color,
                   margin: "2px auto 0",
                 }}
               />
@@ -218,22 +234,33 @@ const UnifiedCalendar: React.FC<UnifiedCalendarProps> = ({
         textColor: "#065f46",
       });
     }
-    if (showBooked) {
-      items.push({
-        label: "Booked",
-        color: "#f59e0b",
-        textColor: "#92400e",
-      });
-    }
     if (showApproved && appointments.length > 0) {
-      items.push({
-        label: "Approved",
-        color: "#3b82f6",
-        textColor: "#1e40af",
-      });
+      // Check if there are any approved appointments
+      const hasApproved = appointments.some(
+        (apt) => (apt.status || "").toLowerCase() === "approved"
+      );
+      // Check if there are any pending appointments
+      const hasPending = appointments.some(
+        (apt) => (apt.status || "").toLowerCase() === "pending"
+      );
+
+      if (hasApproved) {
+        items.push({
+          label: "Approved",
+          color: "#3b82f6",
+          textColor: "#1e40af",
+        });
+      }
+      if (hasPending) {
+        items.push({
+          label: "Pending",
+          color: "#f59e0b",
+          textColor: "#92400e",
+        });
+      }
     }
     return items;
-  }, [availabilities, showBooked, showApproved, appointments]);
+  }, [availabilities, showApproved, appointments]);
 
   const displayLegendItems = legendItems || defaultLegendItems;
 

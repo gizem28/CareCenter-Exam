@@ -43,6 +43,12 @@
   font-weight: 600 !important;
 }
 
+.pending-appointment-date {
+  background: #fde68a !important;
+  color: #92400e !important;
+  font-weight: 600 !important;
+}
+
 .selected-date {
   background: #fde68a !important;
   color: #92400e !important;
