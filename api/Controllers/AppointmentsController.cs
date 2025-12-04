@@ -146,12 +146,12 @@ public async Task<IActionResult> GetByPatient(int patientId)
                 {
                     a.Id,
                     a.Status,
+                    a.ServiceType,
                     Date = a.Availability.Date,
                     WorkerName = a.Availability.HealthcareWorker.FullName,
                     a.PatientId,
                     a.VisitNote,
                     Tasks = a.Tasks.Select(t => new { t.Description, t.Done }),
-                
                     StartTime = FormatTimeSpan(a.SelectedStartTime ?? a.Availability?.StartTime),
                     SelectedStartTime = FormatTimeSpan(a.SelectedStartTime)
                 });
@@ -201,10 +201,6 @@ public async Task<IActionResult> GetByPatient(int patientId)
                     WorkerName = a.Availability?.HealthcareWorker?.FullName ?? "Unknown",
                     WorkerEmail = a.Availability?.HealthcareWorker?.Email ?? "",
                     Date = a.Availability?.Date ?? default(DateTime),
-                    // Use selected times if available, otherwise use availability times
-                    // Format TimeSpan as string "HH:mm:ss" for consistent serialization
-                    StartTime = FormatTimeSpan(a.SelectedStartTime ?? a.Availability?.StartTime),
-                    EndTime = FormatTimeSpan(a.SelectedEndTime ?? a.Availability?.EndTime),
                     SelectedStartTime = FormatTimeSpan(a.SelectedStartTime),
                     SelectedEndTime = FormatTimeSpan(a.SelectedEndTime),
                     a.VisitNote,
