@@ -40,11 +40,14 @@ export const AuthService = {
     }
   },
 
-  forgotPassword: async (email: string) => {
+  forgotPassword: async (email: string): Promise<{ token?: string }> => {
     try {
-      const response = await apiService.post("/Auth/forgot-password", {
-        email,
-      });
+      const response = await apiService.post<{ token?: string }>(
+        "/Auth/forgot-password",
+        {
+          email,
+        }
+      );
       return response;
     } catch (error: any) {
       const errorMessage =
