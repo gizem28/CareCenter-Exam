@@ -54,7 +54,7 @@ const AvailabilityModal: React.FC<AvailabilityModalProps> = ({
         </div>
       </Modal.Body>
       <Modal.Footer>
-        {isFutureDate(availability.date) && (
+        {isFutureDate(availability.date) && !availability.isBooked && (
           <>
             <Button
               variant="primary"

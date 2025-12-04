@@ -75,24 +75,25 @@ const AvailabilityTable: React.FC<AvailabilityTableProps> = ({
                           View Details
                         </Button>
                       )}
-                    {isFutureDate(availability.date) && (
-                      <>
-                        <Button
-                          variant="outline-primary"
-                          size="sm"
-                          onClick={() => onEdit(availability)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outline-danger"
-                          size="sm"
-                          onClick={() => onDelete(availability.id)}
-                        >
-                          Delete
-                        </Button>
-                      </>
-                    )}
+                    {isFutureDate(availability.date) &&
+                      !availability.isBooked && (
+                        <>
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => onEdit(availability)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => onDelete(availability.id)}
+                          >
+                            Delete
+                          </Button>
+                        </>
+                      )}
                   </div>
                 </td>
               </tr>
