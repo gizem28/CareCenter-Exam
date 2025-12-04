@@ -13,10 +13,14 @@ namespace CareCenter.Controllers
         private readonly IAppointmentRepository _repo;
         private readonly AppDbContext _context;
 
-        public AppointmentsController(IAppointmentRepository repo, AppDbContext context)
+        private readonly ILogger<AppointmentsController> _logger;
+
+
+        public AppointmentsController(IAppointmentRepository repo, AppDbContext context, ILogger<AppointmentsController> logger)
         {
             _repo = repo;
             _context = context;
+            _logger = logger;
         }
 
         // 1️ Create appointment (Patient)
@@ -38,6 +42,7 @@ namespace CareCenter.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error creating appointment");
                 return StatusCode(500, new { message = "Error creating appointment", detail = ex.Message });
             }
         }
@@ -62,11 +67,12 @@ public async Task<IActionResult> GetByPatient(int patientId)
     }
     catch (Exception ex)
     {
+        _logger.LogError(ex, "Error fetching appointments");
         return StatusCode(500, new { message = "Error fetching appointments", detail = ex.Message });
     }
 }
 
-        // 3️ Update appointment (e.g., change status or reassign worker)
+        // 3️ Update appointment
      
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] AppointmentUpdateDto dto)
@@ -84,10 +90,12 @@ public async Task<IActionResult> GetByPatient(int patientId)
             }
             catch (InvalidOperationException ex)
             {
+                _logger.LogError(ex, "Invalid operation while updating appointment");
                 return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error updating appointment");
                 return StatusCode(500, new { message = "Error updating appointment", detail = ex.Message });
             }
         }
@@ -105,10 +113,12 @@ public async Task<IActionResult> GetByPatient(int patientId)
             }
             catch (InvalidOperationException ex)
             {
+                _logger.LogError(ex, "Invalid operation while deleting appointment");
                 return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error deleting appointment");
                 return StatusCode(500, new { message = "Error deleting appointment", detail = ex.Message });
             }
         }
@@ -150,6 +160,7 @@ public async Task<IActionResult> GetByPatient(int patientId)
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error fetching worker appointments");
                 return StatusCode(500, new { message = "Error fetching worker appointments", detail = ex.Message });
             }
         }
@@ -183,7 +194,7 @@ public async Task<IActionResult> GetByPatient(int patientId)
                 {
                     a.Id,
                     a.Status,
-                    a.ServiceType,
+                 a.ServiceType,
                     a.PatientId,
                     PatientName = patients.ContainsKey(a.PatientId) ? patients[a.PatientId].FullName : "Unknown",
                     PatientEmail = patients.ContainsKey(a.PatientId) ? patients[a.PatientId].Email : "",
@@ -191,6 +202,8 @@ public async Task<IActionResult> GetByPatient(int patientId)
                     WorkerEmail = a.Availability?.HealthcareWorker?.Email ?? "",
                     Date = a.Availability?.Date ?? default(DateTime),
                     SelectedStartTime = FormatTimeSpan(a.SelectedStartTime),
+                    SelectedEndTime = FormatTimeSpan(a.SelectedEndTime),
+                    a.VisitNote,
                     a.CreatedAt,
                     AvailabilityId = a.AvailabilityId,
                     Availability = a.Availability != null ? new
@@ -206,6 +219,7 @@ public async Task<IActionResult> GetByPatient(int patientId)
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error fetching appointments");
                 return StatusCode(500, new { message = "Error fetching appointments", detail = ex.Message, stackTrace = ex.StackTrace });
             }
         }
@@ -224,10 +238,12 @@ public async Task<IActionResult> GetByPatient(int patientId)
             }
             catch (InvalidOperationException ex)
             {
+                _logger.LogError(ex, "Invalid operation while approving appointment");
                 return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error approving appointment");
                 return StatusCode(500, new { message = "Error approving appointment", detail = ex.Message });
             }
         }
@@ -246,10 +262,12 @@ public async Task<IActionResult> GetByPatient(int patientId)
             }
             catch (InvalidOperationException ex)
             {
+                _logger.LogError(ex, "Invalid operation while rejecting appointment");
                 return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error rejecting appointment");
                 return StatusCode(500, new { message = "Error rejecting appointment", detail = ex.Message });
             }
         }
