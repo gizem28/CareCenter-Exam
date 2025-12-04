@@ -19,8 +19,8 @@ namespace CareCenter.Controllers
             _context = context;
         }
 
-        // 1️⃣ Create appointment (Patient)
-        // This method handles new appointment bookings from patients
+        // 1️ Create appointment (Patient)
+        
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] AppointmentCreateDto dto)
         {
@@ -42,7 +42,7 @@ namespace CareCenter.Controllers
             }
         }
 
-        // 2️⃣ Get appointments for one patient
+        // 2️ Get appointments for one patient
      [HttpGet("patient/{patientId}")]
 public async Task<IActionResult> GetByPatient(int patientId)
 {
@@ -52,7 +52,7 @@ public async Task<IActionResult> GetByPatient(int patientId)
 
         var now = DateTime.Now;
 
-        // SADECE gelecekteki appointment'lar
+       
        var upcoming = appointments
     .Where(a => a.RequestedLocalTime >= DateTime.Now)
     .ToList();
@@ -66,8 +66,8 @@ public async Task<IActionResult> GetByPatient(int patientId)
     }
 }
 
-        // 3️⃣ Update appointment (e.g., change status or reassign worker)
-        // Allows changing appointment details, status, or worker assignment
+        // 3️ Update appointment (e.g., change status or reassign worker)
+     
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] AppointmentUpdateDto dto)
         {
@@ -91,7 +91,7 @@ public async Task<IActionResult> GetByPatient(int patientId)
                 return StatusCode(500, new { message = "Error updating appointment", detail = ex.Message });
             }
         }
-        // 4️⃣ Delete appointment
+        // 4️. Delete appointment
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id, [FromQuery] string? role = null)
         {
@@ -113,7 +113,7 @@ public async Task<IActionResult> GetByPatient(int patientId)
             }
         }
 
-        // 5️⃣ Get appointments for one worker
+        // 5️. Get appointments for one worker
         [HttpGet("worker/{workerId}")]
         public async Task<IActionResult> GetByWorker(int workerId)
         {
@@ -124,14 +124,14 @@ public async Task<IActionResult> GetByPatient(int patientId)
                 if (!appointments.Any())
                     return NotFound(new { message = "No appointments found for this worker." });
 
-                // Helper function to format TimeSpan safely
+            
                 string? FormatTimeSpan(TimeSpan? ts)
                 {
                     if (ts == null) return null;
                     return ts.Value.ToString(@"hh\:mm\:ss");
                 }
 
-                // Daha okunabilir bir JSON döndürmek için sade DTO oluşturabiliriz:
+            
                 var result = appointments.Select(a => new
                 {
                     a.Id,
@@ -140,6 +140,9 @@ public async Task<IActionResult> GetByPatient(int patientId)
                     Date = a.Availability.Date,
                     WorkerName = a.Availability.HealthcareWorker.FullName,
                     a.PatientId,
+                    a.VisitNote,
+                    Tasks = a.Tasks.Select(t => new { t.Description, t.Done }),
+                    StartTime = FormatTimeSpan(a.SelectedStartTime ?? a.Availability?.StartTime),
                     SelectedStartTime = FormatTimeSpan(a.SelectedStartTime)
                 });
 
@@ -151,7 +154,7 @@ public async Task<IActionResult> GetByPatient(int patientId)
             }
         }
 
-        // 6️⃣ Get all appointments (Admin)
+        // 6️. Get all appointments (Admin)
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -162,20 +165,20 @@ public async Task<IActionResult> GetByPatient(int patientId)
                 if (!appointments.Any())
                     return NotFound(new { message = "No appointments found." });
 
-                // Get patient information
+     
                 var patientIds = appointments.Select(a => a.PatientId).Distinct().ToList();
                 var patients = await _context.Patients
                     .Where(p => patientIds.Contains(p.Id))
                     .ToDictionaryAsync(p => p.Id, p => p);
 
-                // Helper function to format TimeSpan safely
+               
                 string? FormatTimeSpan(TimeSpan? ts)
                 {
                     if (ts == null) return null;
                     return ts.Value.ToString(@"hh\:mm\:ss");
                 }
 
-                // Include patient information for admin view
+            
                 var result = appointments.Select(a => new
                 {
                     a.Id,
@@ -207,7 +210,7 @@ public async Task<IActionResult> GetByPatient(int patientId)
             }
         }
 
-        // 7️⃣ Approve appointment (Admin)
+        // 7️. Approve appointment (Admin)
         [HttpPost("{id}/approve")]
         public async Task<IActionResult> Approve(int id)
         {
@@ -229,7 +232,7 @@ public async Task<IActionResult> GetByPatient(int patientId)
             }
         }
 
-        // 8️⃣ Reject appointment (Admin) - releases the slot
+        // 8️. Reject appointment (Admin)
         [HttpPost("{id}/reject")]
         public async Task<IActionResult> Reject(int id)
         {

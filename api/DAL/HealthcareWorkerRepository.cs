@@ -99,7 +99,7 @@ namespace CareCenter.DAL
         {
             try
             {
-                // Validate UserId exists
+                
                 if (string.IsNullOrEmpty(dto.UserId))
                     throw new InvalidOperationException("UserId is required. Healthcare worker must be linked to an AuthUser.");
 
@@ -107,7 +107,7 @@ namespace CareCenter.DAL
                 if (authUser == null)
                     throw new InvalidOperationException($"AuthUser with ID {dto.UserId} not found.");
 
-                // Duplicate kontrolü
+              
                 var exists = await _context.HealthcareWorkers.AnyAsync(w =>
                     w.UserId == dto.UserId ||
                     w.Email.ToLower() == dto.Email.ToLower() ||
@@ -135,7 +135,7 @@ namespace CareCenter.DAL
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Duplicate healthcare worker detected or invalid UserId");
-                throw; // controller bunu Conflict olarak yakalayabilir
+                throw; 
             }
             catch (Exception ex)
             {
@@ -188,7 +188,12 @@ namespace CareCenter.DAL
                 {
                     if (availability.Appointment != null)
                     {
-                        // Delete the appointment
+                        // Remove associated tasks before deleting appointment
+                        if (availability.Appointment.Tasks != null && availability.Appointment.Tasks.Any())
+                        {
+                            _context.AppointmentTasks.RemoveRange(availability.Appointment.Tasks);
+                        }
+                       
                         _context.Appointments.Remove(availability.Appointment);
                     }
                 }
@@ -199,17 +204,17 @@ namespace CareCenter.DAL
                     _context.Availabilities.RemoveRange(availabilities);
                 }
 
-                // Save changes to delete availabilities and appointments first
+               
                 await _context.SaveChangesAsync();
 
-                // Store UserId before deleting worker
+                
                 var userId = w.UserId;
 
-                // Delete the worker first
+              
                 _context.HealthcareWorkers.Remove(w);
                 await _context.SaveChangesAsync();
 
-                // Delete the associated AuthUser (cascade delete would have handled it, but we do it explicitly for clarity)
+                // Delete the associated AuthUser 
                 if (!string.IsNullOrEmpty(userId))
                 {
                     var authUser = await _userManager.FindByIdAsync(userId);
@@ -220,7 +225,7 @@ namespace CareCenter.DAL
                         {
                             _logger.LogWarning("Failed to delete AuthUser for healthcare worker {WorkerId}: {Errors}", 
                                 id, string.Join(", ", deleteResult.Errors.Select(e => e.Description)));
-                            // Don't throw - worker is already deleted
+                        
                         }
                     }
                 }

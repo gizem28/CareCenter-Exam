@@ -15,7 +15,7 @@ namespace CareCenter.DAL
 
         public async Task<Appointment> CreateAsync(AppointmentCreateDto dto)
         {
-            // Availability kontrolü
+        
             var availability = await _context.Availabilities
                 .Include(a => a.Appointment)
                 .FirstOrDefaultAsync(a => a.Id == dto.AvailabilityId);
@@ -59,6 +59,7 @@ namespace CareCenter.DAL
             return await _context.Appointments
                 .Include(a => a.Availability)
                 .ThenInclude(av => av.HealthcareWorker)
+                .Include(a => a.Tasks)
                 .Where(a => a.PatientId == patientId)
                 .ToListAsync();
         }
@@ -67,12 +68,12 @@ namespace CareCenter.DAL
         {
             var appointment = await _context.Appointments
                 .Include(a => a.Availability)
+                .Include(a => a.Tasks)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (appointment == null)
                 return null;
 
-            // Admin worker değiştirmek isterse → AvailabilityId güncelle
             if (dto.AvailabilityId.HasValue)
             {
                 var newAvailability = await _context.Availabilities
@@ -82,9 +83,6 @@ namespace CareCenter.DAL
                 if (newAvailability == null)
                     throw new InvalidOperationException("New availability not found.");
 
-                // Allow updating if:
-                // 1. It's the same availability (current appointment), OR
-                // 2. The availability has no other appointment
                 if (newAvailability.Appointment != null && newAvailability.Appointment.Id != appointment.Id)
                     throw new InvalidOperationException("This worker's availability is already booked.");
 
@@ -97,12 +95,39 @@ namespace CareCenter.DAL
             if (!string.IsNullOrEmpty(dto.ServiceType))
                 appointment.ServiceType = dto.ServiceType;
 
-            // Update selected start time if provided
+            if (dto.VisitNote != null)
+                appointment.VisitNote = dto.VisitNote;
+
+            if (dto.Tasks != null && dto.Tasks.Any())
+            {
+                // Remove existing tasks
+                _context.AppointmentTasks.RemoveRange(appointment.Tasks);
+
+                // Add new tasks
+                foreach (var task in dto.Tasks)
+                {
+                    appointment.Tasks.Add(new AppointmentTask
+                    {
+                        Description = task,
+                        Status = "Pending",
+                        Done = false
+                    });
+                }
+            }
+
             if (!string.IsNullOrEmpty(dto.SelectedStartTime))
             {
                 if (TimeSpan.TryParse(dto.SelectedStartTime, out var startTime))
                 {
                     appointment.SelectedStartTime = startTime;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(dto.SelectedEndTime))
+            {
+                if (TimeSpan.TryParse(dto.SelectedEndTime, out var endTime))
+                {
+                    appointment.SelectedEndTime = endTime;
                 }
             }
 
@@ -114,12 +139,12 @@ namespace CareCenter.DAL
         {
             var appointment = await _context.Appointments
                 .Include(a => a.Availability)
+                .Include(a => a.Tasks)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (appointment == null)
                 return false;
 
-            // Admin "Reject" etmek isterse sadece status değiştir
             if (role == "Admin")
             {
                 appointment.Status = "Rejected";
@@ -127,7 +152,6 @@ namespace CareCenter.DAL
                 return true;
             }
 
-            // Patient ise sadece kendi randevusunu iptal eder
             if (role == "Patient")
             {
                 appointment.Status = "Cancelled";
@@ -135,7 +159,12 @@ namespace CareCenter.DAL
                 return true;
             }
 
-            // Admin gerçekten tamamen silmek isterse (isteğe bağlı)
+            // Remove associated tasks before deleting appointment
+            if (appointment.Tasks != null && appointment.Tasks.Any())
+            {
+                _context.AppointmentTasks.RemoveRange(appointment.Tasks);
+            }
+
             _context.Appointments.Remove(appointment);
             await _context.SaveChangesAsync();
             return true;
@@ -147,6 +176,7 @@ namespace CareCenter.DAL
             return await _context.Appointments
                 .Include(a => a.Availability)
                     .ThenInclude(av => av.HealthcareWorker)
+                .Include(a => a.Tasks)
                 .Where(a => a.Availability.HealthcareWorkerId == workerId)
                 .ToListAsync();
         }
@@ -156,6 +186,7 @@ namespace CareCenter.DAL
             return await _context.Appointments
                 .Include(a => a.Availability)
                     .ThenInclude(av => av.HealthcareWorker)
+                .Include(a => a.Tasks)
                 .OrderByDescending(a => a.CreatedAt)
                 .ToListAsync();
         }
@@ -164,6 +195,7 @@ namespace CareCenter.DAL
         {
             var appointment = await _context.Appointments
                 .Include(a => a.Availability)
+                .Include(a => a.Tasks)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (appointment == null)
@@ -179,13 +211,18 @@ namespace CareCenter.DAL
         {
             var appointment = await _context.Appointments
                 .Include(a => a.Availability)
+                .Include(a => a.Tasks)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (appointment == null)
                 return null;
 
-            // Delete the appointment to release the availability slot
-            // The availability will become available again for booking
+            // Remove associated tasks before deleting appointment
+            if (appointment.Tasks != null && appointment.Tasks.Any())
+            {
+                _context.AppointmentTasks.RemoveRange(appointment.Tasks);
+            }
+
             _context.Appointments.Remove(appointment);
             await _context.SaveChangesAsync();
 

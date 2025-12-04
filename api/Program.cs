@@ -19,17 +19,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // ---------------- IDENTITY ----------------
 builder.Services.AddIdentity<AuthUser, IdentityRole>(options =>
 {
-    // Configure password requirements
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 6;
     options.Password.RequiredUniqueChars = 1;
-    
-    // User settings
     options.User.RequireUniqueEmail = true;
-    options.SignIn.RequireConfirmedEmail = false; // Allow login without email confirmation
+    options.SignIn.RequireConfirmedEmail = false; 
 })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
@@ -63,7 +60,6 @@ builder.Services.AddCors(options =>
 {
     if (builder.Environment.IsDevelopment())
     {
-        // In development, allow all localhost origins
         options.AddPolicy("AllowFrontend", policy =>
         {
             policy.WithOrigins(
@@ -81,7 +77,7 @@ builder.Services.AddCors(options =>
     }
     else
     {
-        // In production, only allow specific origins
+        
         options.AddPolicy("AllowFrontend", policy =>
         {
             policy.WithOrigins("http://localhost:5173", "http://localhost:3000")
@@ -117,8 +113,6 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // ---------------- DATABASE INITIALIZATION (Development) ----------------
-// This replaces migrations with code-based database initialization
-// Creates tables and relationships based on your DbContext models
 if (app.Environment.IsDevelopment())
 {
     using (var scope = app.Services.CreateScope())
@@ -131,7 +125,7 @@ if (app.Environment.IsDevelopment())
         try
         {
             // Create database and tables if they don't exist
-            // This replaces all the complex migration logic with simple table creation
+           
             await dbContext.Database.EnsureCreatedAsync();
             logger.LogInformation("Database tables created successfully from DbContext models");
 
@@ -175,7 +169,7 @@ async Task SeedTestUsersAsync(UserManager<AuthUser> userManager, RoleManager<Ide
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(patient, "Patient");
-            patientUser = patient; // Assign the created user to patientUser
+            patientUser = patient; 
         }
     }
     
@@ -215,17 +209,17 @@ async Task SeedTestUsersAsync(UserManager<AuthUser> userManager, RoleManager<Ide
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(worker, "Worker");
-            workerUser = worker; // Assign the created user to workerUser
+            workerUser = worker; 
         }
     }
     
-    // Ensure HealthcareWorker record exists (even if AuthUser was already created)
+
     HealthcareWorker? testWorker = null;
     if (workerUser != null && !await dbContext.HealthcareWorkers.AnyAsync(w => w.Email == workerEmail))
     {
         testWorker = new HealthcareWorker
         {
-            UserId = workerUser.Id, // Set the required UserId
+            UserId = workerUser.Id, 
             FullName = "Test Worker",
             Email = workerEmail,
             Phone = "+47 123 45 678",
@@ -248,7 +242,7 @@ async Task SeedTestUsersAsync(UserManager<AuthUser> userManager, RoleManager<Ide
         {
             testPatient = new Patient
             {
-                UserId = patientUser.Id, // Set the required UserId
+                UserId = patientUser.Id, 
                 FullName = "Test Patient",
                 Email = patientEmail,
                 Phone = "12345678",
@@ -266,11 +260,9 @@ async Task SeedTestUsersAsync(UserManager<AuthUser> userManager, RoleManager<Ide
         var today = DateTime.Today;
         var availabilities = new List<Availability>();
         
-        // Create availabilities for the next 2 weeks (Monday to Friday, 9 AM - 5 PM)
         for (int i = 0; i < 14; i++)
         {
             var date = today.AddDays(i);
-            // Skip weekends
             if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
                 continue;
                 
@@ -278,12 +270,12 @@ async Task SeedTestUsersAsync(UserManager<AuthUser> userManager, RoleManager<Ide
             {
                 HealthcareWorkerId = testWorker.Id,
                 Date = date,
-                StartTime = new TimeSpan(9, 0, 0), // 9:00 AM
-                EndTime = new TimeSpan(17, 0, 0)   // 5:00 PM
+                StartTime = new TimeSpan(9, 0, 0), 
+                EndTime = new TimeSpan(17, 0, 0)  
             });
         }
         
-        // Add one all-day availability
+    
         availabilities.Add(new Availability
         {
             HealthcareWorkerId = testWorker.Id,
@@ -318,7 +310,6 @@ async Task SeedTestUsersAsync(UserManager<AuthUser> userManager, RoleManager<Ide
 }
 
 // ---------------- MIDDLEWARE ----------------
-// CORS must be first to handle preflight requests
 app.UseCors("AllowFrontend");
 
 if (app.Environment.IsDevelopment())
@@ -328,8 +319,6 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "CareCenter API V1");
     });
-    // Disable HTTPS redirection in development to avoid CORS issues
-    // app.UseHttpsRedirection();
 }
 else
 {

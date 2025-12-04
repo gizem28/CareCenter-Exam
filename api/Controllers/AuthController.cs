@@ -10,8 +10,6 @@ using System.Text;
 
 namespace CareCenter.Controllers
 {
-    // Authentication controller for login, register, password reset
-    // Dette håndterer all autentisering i systemet
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
@@ -22,8 +20,6 @@ namespace CareCenter.Controllers
         private readonly ILogger<AuthController> _logger;
         private readonly IPatientRepository _patientRepository;
 
-        // Constructor with dependency injection for auth services
-        // Dette setter opp alle tjenestene vi trenger for autentisering
         public AuthController(
             UserManager<AuthUser> userManager,
             RoleManager<IdentityRole> roleManager,
@@ -44,20 +40,20 @@ namespace CareCenter.Controllers
         {
             try
             {
-                // --- 1️⃣ DTO Validation ---
+        
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                // --- 2️⃣ Role Validation ---
+           
                 if (!await _roleManager.RoleExistsAsync(dto.Role))
                     await _roleManager.CreateAsync(new IdentityRole(dto.Role));
 
-                // --- 3️⃣ Email Uniqueness Check ---
+             
                 var existingUser = await _userManager.FindByEmailAsync(dto.Email);
                 if (existingUser != null)
                     return Conflict(new { message = "Email is already registered" });
 
-                // --- 4️⃣ Create User ---
+          
                 var user = new AuthUser
                 {
                     UserName = dto.Email,
@@ -82,7 +78,6 @@ namespace CareCenter.Controllers
         }
 
         // ---------- PATIENT REGISTER ----------
-        // This creates both AuthUser and Patient record
         [HttpPost("register-patient")]
         public async Task<IActionResult> RegisterPatient([FromBody] PatientRegisterDto dto)
         {
@@ -91,16 +86,16 @@ namespace CareCenter.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                // Check if email is already registered
+        
                 var existingUser = await _userManager.FindByEmailAsync(dto.Email);
                 if (existingUser != null)
                     return Conflict(new { message = "Email is already registered" });
 
-                // Ensure Patient role exists
+          
                 if (!await _roleManager.RoleExistsAsync("Patient"))
                     await _roleManager.CreateAsync(new IdentityRole("Patient"));
 
-                // Create AuthUser
+   
                 var user = new AuthUser
                 {
                     UserName = dto.Email,
@@ -116,23 +111,23 @@ namespace CareCenter.Controllers
 
                 await _userManager.AddToRoleAsync(user, "Patient");
 
-                // Check if patient record already exists for this user
+         
                 var existingPatient = await _patientRepository.GetByEmailAsync(dto.Email);
                 if (existingPatient != null)
                 {
-                    // Patient already exists, return success (they're already registered)
+      
                     return Ok(new { message = "Patient account already exists. Please login instead." });
                 }
 
-                // Parse birth date
+   
                 if (!DateTime.TryParse(dto.BirthDate, out var birthDate))
                 {
-                    // If parsing fails, delete the created user and return error
+            
                     await _userManager.DeleteAsync(user);
                     return BadRequest(new { message = "Invalid birth date format" });
                 }
 
-                // Create Patient record
+       
                 var patientDto = new PatientDTO
                 {
                     UserId = user.Id,
@@ -151,7 +146,7 @@ namespace CareCenter.Controllers
             {
                 _logger.LogError(ex, "Error occurred during patient registration");
                 
-                // If patient creation failed, try to clean up the user
+       
                 var user = await _userManager.FindByEmailAsync(dto.Email);
                 if (user != null)
                 {
@@ -174,15 +169,14 @@ namespace CareCenter.Controllers
                 var user = await _userManager.FindByEmailAsync(dto.Email);
                 if (user == null)
                 {
-                    // Don't reveal if email exists or not for security
+                 
                     return Ok(new { message = "If the email exists, a password reset link has been sent." });
                 }
 
                 // Generate password reset token
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-                // In a real application, you would send this token via email
-                // For now, we'll just return a success message
+        
                 return Ok(new
                 {
                     message = "If the email exists, a password reset link has been sent."

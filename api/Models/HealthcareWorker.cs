@@ -23,7 +23,7 @@ namespace CareCenter.Models
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Position is required")]
-        public string Position { get; set; } = string.Empty; // örn. "Sykepleier" eller "Helsefagarbeider"
+        public string Position { get; set; } = string.Empty; 
 
     }
 }

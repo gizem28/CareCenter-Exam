@@ -50,15 +50,15 @@ namespace CareCenter.DAL
 
                 var dateToAdd = dto.Date.Value;
 
-                // 1️⃣ Geçmiş tarih kontrolü (lokal saat)
+             
                 if (dateToAdd.Date < DateTime.Now.Date)
                     throw new InvalidOperationException($"Cannot add past date: {dateToAdd:yyyy-MM-dd}");
 
-                // 2️⃣ Maksimum 30 gün ileri kontrolü
+                
                 if ((dateToAdd.Date - DateTime.Now.Date).TotalDays > 30)
                     throw new InvalidOperationException($"Availability can only be added up to 30 days ahead (invalid: {dateToAdd:yyyy-MM-dd}).");
 
-                // 3️⃣ Aynı güne ikinci giriş varsa hata
+               
                 var exists = await _context.Availabilities.AnyAsync(a =>
                     a.HealthcareWorkerId == dto.HealthcareWorkerId &&
                     a.Date.Date == dateToAdd.Date);
@@ -68,7 +68,7 @@ namespace CareCenter.DAL
                     throw new InvalidOperationException($"Availability already exists for date: {dateToAdd:yyyy-MM-dd}");
                 }
 
-                // 4️⃣ Ekleme
+             
                 var availability = new Availability
                 {
                     HealthcareWorkerId = dto.HealthcareWorkerId,
@@ -119,7 +119,7 @@ namespace CareCenter.DAL
             if ((dateToUpdate.Date - DateTime.Today).TotalDays > 30)
                 throw new InvalidOperationException("Date cannot be more than 30 days in the future.");
 
-            // Update fields
+            
             entity.Date = dateToUpdate;
             if (dto.StartTime.HasValue)
                 entity.StartTime = dto.StartTime;
@@ -150,12 +150,13 @@ namespace CareCenter.DAL
             return true;
         }
 
+        // Only unbooked and future dates
         public async Task<IEnumerable<AvailabilityDTO>> GetUnbookedAsync()
         {
             var results = await _context.Availabilities
                 .Include(a => a.Appointment)
                 .Include(a => a.HealthcareWorker)
-                .Where(a => a.Appointment == null && a.Date >= DateTime.Today) // Only unbooked and future dates
+                .Where(a => a.Appointment == null && a.Date >= DateTime.Today) 
                 .Select(a => new AvailabilityDTO
                 {
                     Id = a.Id,
@@ -169,7 +170,7 @@ namespace CareCenter.DAL
                 })
                 .ToListAsync();
 
-            // Order in memory to avoid SQLite TimeSpan ordering limitation
+          
             return results
                 .OrderBy(a => a.Date)
                 .ThenBy(a => a.StartTime ?? TimeSpan.Zero)
