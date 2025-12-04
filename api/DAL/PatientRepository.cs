@@ -182,29 +182,17 @@ namespace CareCenter.DAL
                 var patient = await _context.Patients.FindAsync(id);
                 if (patient == null) return false;
 
-                // Get all appointments for this patient, including their tasks
+                // Get all appointments for this patient
                 var appointments = await _context.Appointments
-                    .Include(apt => apt.Tasks)
                     .Where(apt => apt.PatientId == id)
                     .ToListAsync();
 
-                // Delete all appointment tasks first
-                foreach (var appointment in appointments)
-                {
-                    if (appointment.Tasks != null && appointment.Tasks.Any())
-                    {
-                        _context.AppointmentTasks.RemoveRange(appointment.Tasks);
-                    }
-                }
-
-                // Delete all appointments for this patient
+                // Delete appointments
                 if (appointments.Any())
                 {
                     _context.Appointments.RemoveRange(appointments);
+                    await _context.SaveChangesAsync();
                 }
-
-                // Save changes to delete appointments first
-                await _context.SaveChangesAsync();
 
                 // Store UserId before deleting patient
                 var userId = patient.UserId;

@@ -171,11 +171,10 @@ const PatientDashboard: React.FC = () => {
           id: apt.id || apt.Id,
           patientId: apt.patientId || apt.PatientId,
           status: apt.status || apt.Status || "Pending",
+          serviceType: apt.serviceType || apt.ServiceType || "",
           availabilityId: apt.availabilityId || apt.AvailabilityId,
           date: availabilityDate,
-          visitNote: apt.visitNote || apt.VisitNote,
           createdAt: apt.createdAt || apt.CreatedAt,
-          tasks: apt.tasks || apt.Tasks || [],
           // Include selected times from appointment
           selectedStartTime: apt.selectedStartTime || apt.SelectedStartTime,
           selectedEndTime: apt.selectedEndTime || apt.SelectedEndTime,
@@ -302,7 +301,7 @@ const PatientDashboard: React.FC = () => {
       const appointmentData: AppointmentCreateDto = {
         availabilityId: request.availabilityId,
         patientId: finalPatientId,
-        tasks: [request.serviceType],
+        serviceType: request.serviceType,
         requestedLocalTime: new Date(request.selectedDate),
         selectedStartTime: selectedStartTime,
       };
@@ -345,25 +344,13 @@ const PatientDashboard: React.FC = () => {
   ) => {
     try {
       setError("");
-      // If serviceType is provided, we need to update tasks
-      const updateData: any = {
+      const updateData: AppointmentUpdateDto = {
         availabilityId: data.availabilityId,
         status: data.status,
+        serviceType: data.serviceType,
+        selectedStartTime: data.selectedStartTime,
+        selectedEndTime: data.selectedEndTime,
       };
-
-      // If serviceType is provided, add it to the update data
-      if (data.serviceType) {
-        updateData.tasks = [data.serviceType];
-      }
-
-      // If selected times are provided, add them to the update data
-      if (data.selectedStartTime) {
-        updateData.selectedStartTime = data.selectedStartTime;
-      }
-
-      if (data.selectedEndTime) {
-        updateData.selectedEndTime = data.selectedEndTime;
-      }
 
       await appointmentRequests.update(id, updateData);
       await loadAppointments();

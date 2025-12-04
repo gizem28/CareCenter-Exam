@@ -19,26 +19,13 @@ namespace CareCenter.Models
         [Required]
         public string Status { get; set; } = "Pending";
 
-        public string? VisitNote { get; set; }
+        [Required]
+        public string ServiceType { get; set; } = string.Empty;
 
-        public DateTime RequestedLocalTime { get; set; }     // Kullanıcının seçtiği saat
+        public DateTime RequestedLocalTime { get; set; }
         
         // Selected time range by the patient
         public TimeSpan? SelectedStartTime { get; set; }
         public TimeSpan? SelectedEndTime { get; set; }
-        
-        public ICollection<AppointmentTask> Tasks { get; set; } = new List<AppointmentTask>();
-    }
-
-    public class AppointmentTask
-    {
-        public int Id { get; set; }
-        public int AppointmentId { get; set; }
-        public Appointment Appointment { get; set; } = null!;
-
-        [Required]
-        public string Status { get; set; } = "Pending";
-        [Required] public string Description { get; set; } = string.Empty;
-        public bool Done { get; set; } //do we need this? We already have status field
     }
 }

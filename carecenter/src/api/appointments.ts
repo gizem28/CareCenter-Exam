@@ -7,24 +7,17 @@ export interface AppointmentDTO {
   patientName?: string;
   workerId?: number;
   workerName?: string;
-  appointmentDate?: string;
-  appointmentTime?: string;
   status: string;
-  notes?: string;
-  serviceType?: string;
-  availabilityId?: number;
-  date?: string;
-  tasks?: Array<{
-    description: string;
-    done: boolean;
-    id?: number;
-    appointmentId?: number;
-  }>;
-  visitNote?: string;
+  serviceType: string;
   createdAt?: string;
+  availabilityId?: number;
+  // Date of the appointment
+  date: string;
   // Selected time range by the patient
   selectedStartTime?: string;
   selectedEndTime?: string;
+  // Display-only field (formatted time, added by frontend)
+  appointmentTime?: string;
   // Backend model fields
   availability?: {
     id: number;
@@ -43,7 +36,7 @@ export interface AppointmentDTO {
 export interface AppointmentCreateDto {
   availabilityId: number;
   patientId: number;
-  tasks: string[];
+  serviceType: string;
   requestedLocalTime?: Date | string;
   selectedStartTime?: string; // TimeSpan format "HH:mm:ss" or "HH:mm"
   selectedEndTime?: string; // TimeSpan format "HH:mm:ss" or "HH:mm"
@@ -52,8 +45,7 @@ export interface AppointmentCreateDto {
 export interface AppointmentUpdateDto {
   availabilityId?: number;
   status?: string;
-  visitNote?: string;
-  tasks?: string[];
+  serviceType?: string;
   selectedStartTime?: string;
   selectedEndTime?: string;
 }

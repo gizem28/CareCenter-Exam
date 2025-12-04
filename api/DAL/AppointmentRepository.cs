@@ -51,16 +51,12 @@ namespace CareCenter.DAL
                 AvailabilityId = dto.AvailabilityId,
                 PatientId = dto.PatientId,
                 Status = "Pending",
+                ServiceType = dto.ServiceType,
                 CreatedAt = DateTime.UtcNow,
                 RequestedLocalTime = dto.RequestedLocalTime,
                 SelectedStartTime = selectedStartTime,
                 SelectedEndTime = selectedEndTime,
             };
-
-            foreach (var task in dto.Tasks)
-            {
-                appointment.Tasks.Add(new AppointmentTask { Description = task });
-            }
 
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
@@ -73,7 +69,6 @@ namespace CareCenter.DAL
             return await _context.Appointments
                 .Include(a => a.Availability)
                 .ThenInclude(av => av.HealthcareWorker)
-                .Include(a => a.Tasks)
                 .Where(a => a.PatientId == patientId)
                 .ToListAsync();
         }
@@ -82,7 +77,6 @@ namespace CareCenter.DAL
         {
             var appointment = await _context.Appointments
                 .Include(a => a.Availability)
-                .Include(a => a.Tasks)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (appointment == null)
@@ -110,26 +104,8 @@ namespace CareCenter.DAL
             if (!string.IsNullOrEmpty(dto.Status))
                 appointment.Status = dto.Status;
 
-            if (!string.IsNullOrEmpty(dto.VisitNote))
-                appointment.VisitNote = dto.VisitNote;
-
-            // Update tasks if provided
-            if (dto.Tasks != null && dto.Tasks.Any())
-            {
-                // Clear existing tasks
-                _context.AppointmentTasks.RemoveRange(appointment.Tasks);
-
-                // Add new tasks
-                foreach (var task in dto.Tasks)
-                {
-                    appointment.Tasks.Add(new AppointmentTask
-                    {
-                        Description = task,
-                        Status = "Pending",
-                        Done = false
-                    });
-                }
-            }
+            if (!string.IsNullOrEmpty(dto.ServiceType))
+                appointment.ServiceType = dto.ServiceType;
 
             // Update selected times if provided
             if (!string.IsNullOrEmpty(dto.SelectedStartTime))
@@ -189,7 +165,6 @@ namespace CareCenter.DAL
             return await _context.Appointments
                 .Include(a => a.Availability)
                     .ThenInclude(av => av.HealthcareWorker)
-                .Include(a => a.Tasks)
                 .Where(a => a.Availability.HealthcareWorkerId == workerId)
                 .ToListAsync();
         }
@@ -199,7 +174,6 @@ namespace CareCenter.DAL
             return await _context.Appointments
                 .Include(a => a.Availability)
                     .ThenInclude(av => av.HealthcareWorker)
-                .Include(a => a.Tasks)
                 .OrderByDescending(a => a.CreatedAt)
                 .ToListAsync();
         }
@@ -208,7 +182,6 @@ namespace CareCenter.DAL
         {
             var appointment = await _context.Appointments
                 .Include(a => a.Availability)
-                .Include(a => a.Tasks)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (appointment == null)
@@ -224,7 +197,6 @@ namespace CareCenter.DAL
         {
             var appointment = await _context.Appointments
                 .Include(a => a.Availability)
-                .Include(a => a.Tasks)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (appointment == null)

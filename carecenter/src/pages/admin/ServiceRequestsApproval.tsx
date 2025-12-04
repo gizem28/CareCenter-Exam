@@ -98,9 +98,8 @@ const ServiceRequestsApproval: React.FC = () => {
             endTime: endTime,
             selectedStartTime: selectedStartTime,
             selectedEndTime: selectedEndTime,
-            visitNote: apt.VisitNote || apt.visitNote,
             createdAt: apt.CreatedAt || apt.createdAt,
-            tasks: apt.Tasks || apt.tasks || [],
+            serviceType: apt.ServiceType || apt.serviceType || "",
             patientName,
             patientEmail,
             workerName: apt.WorkerName || apt.workerName || "Unknown",
@@ -232,19 +231,7 @@ const ServiceRequestsApproval: React.FC = () => {
   };
 
   const getServiceType = (appointment: ServiceRequestWithPatient): string => {
-    if (appointment.tasks && appointment.tasks.length > 0) {
-      const firstTask = appointment.tasks[0];
-      if (typeof firstTask === "string") {
-        return firstTask;
-      } else if (firstTask && typeof firstTask === "object") {
-        return (
-          (firstTask as any).description ||
-          (firstTask as any).Description ||
-          "N/A"
-        );
-      }
-    }
-    return "N/A";
+    return appointment.serviceType || "N/A";
   };
 
   const pendingAppointments = appointments.filter(

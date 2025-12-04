@@ -305,17 +305,12 @@ async Task SeedTestUsersAsync(UserManager<AuthUser> userManager, RoleManager<Ide
                 AvailabilityId = bookedAvailability.Id,
                 PatientId = testPatient.Id,
                 Status = "Pending",
-                VisitNote = "Initial consultation",
+                ServiceType = "Medical Care", // Use one of the valid service types
                 CreatedAt = DateTime.UtcNow,
-                RequestedLocalTime = bookedAvailability.Date // Set requested time to the availability date
+                RequestedLocalTime = bookedAvailability.Date, // Set requested time to the availability date
+                SelectedStartTime = new TimeSpan(9, 0, 0),
+                SelectedEndTime = new TimeSpan(10, 0, 0)
             };
-            
-            // Use one of the valid service types: "Medical Care", "Medication Delivery", "Companionship", "Personal Care"
-            appointment.Tasks.Add(new AppointmentTask
-            {
-                Description = "Medical Care",
-                Done = false
-            });
             
             dbContext.Appointments.Add(appointment);
             await dbContext.SaveChangesAsync();

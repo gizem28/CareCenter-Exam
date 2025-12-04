@@ -1,17 +1,23 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace CareCenter.DTOs
 {
     public class AppointmentCreateDto
     {
+        [Required]
         public int AvailabilityId { get; set; }
+        
+        [Required]
         public int PatientId { get; set; }
+        
+        [Required]
         public DateTime RequestedLocalTime { get; set; }
         
+        [Required]
+        public string ServiceType { get; set; } = string.Empty;
+        
         // Selected time range by the patient (optional - if not provided, uses availability times)
-        // Accept as string and convert to TimeSpan in controller
         public string? SelectedStartTime { get; set; }
         public string? SelectedEndTime { get; set; }
-
-        public List<string> Tasks { get; set; } = new();
-
     }
 }

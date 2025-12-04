@@ -14,7 +14,7 @@ import WorkerTable from "../../components/admin/WorkerTable";
 import AppointmentTable from "../../components/admin/AppointmentTable";
 import PatientModal from "../../components/admin/PatientModal";
 import WorkerModal from "../../components/admin/WorkerModal";
-import AppointmentModal from "../../components/admin/AppointmentModal";
+import AppointmentDetailsModal from "../../components/shared/AppointmentDetailsModal";
 
 interface Dashboard {
   stats: {
@@ -44,6 +44,8 @@ const ManagerDashboard: React.FC = () => {
     useState<AppointmentDTO | null>(null);
   const [showAppointmentModal, setShowAppointmentModal] =
     useState<boolean>(false);
+  const [patientInfo, setPatientInfo] = useState<PatientDTO | null>(null);
+  const [loadingPatient, setLoadingPatient] = useState(false);
 
   const formatTimeSpan = (timeSpan: string | undefined): string => {
     if (!timeSpan) return "N/A";
@@ -85,38 +87,21 @@ const ManagerDashboard: React.FC = () => {
       const appointmentsData =
         appointmentsResult.status === "fulfilled"
           ? appointmentsResult.value.map((apt: any) => {
-              const startTime = apt.startTime || apt.StartTime;
-              const endTime = apt.endTime || apt.EndTime;
+              // Format display time from selectedStartTime and selectedEndTime
               let timeDisplay = "N/A";
-              if (startTime) {
-                const formattedStart = formatTimeSpan(startTime);
-                if (endTime) {
-                  const formattedEnd = formatTimeSpan(endTime);
+              if (apt.selectedStartTime) {
+                const formattedStart = formatTimeSpan(apt.selectedStartTime);
+                if (apt.selectedEndTime) {
+                  const formattedEnd = formatTimeSpan(apt.selectedEndTime);
                   timeDisplay = `${formattedStart} - ${formattedEnd}`;
                 } else {
                   timeDisplay = formattedStart;
                 }
               }
 
-              let serviceType = "N/A";
-              if (apt.tasks && apt.tasks.length > 0) {
-                const firstTask = apt.tasks[0];
-                if (typeof firstTask === "string") {
-                  serviceType = firstTask;
-                } else if (firstTask && typeof firstTask === "object") {
-                  serviceType =
-                    firstTask.description || firstTask.Description || "N/A";
-                }
-              }
-
               return {
                 ...apt,
-                appointmentDate: apt.date || apt.Date || apt.appointmentDate,
                 appointmentTime: timeDisplay,
-                serviceType: serviceType,
-                date: apt.date || apt.Date,
-                startTime: startTime,
-                endTime: endTime,
               };
             })
           : [];
@@ -149,7 +134,7 @@ const ManagerDashboard: React.FC = () => {
     loadDashboard();
   };
 
-  const formatDate = (dateString: string | undefined): string => {
+  const formatDate = (dateString?: string | null): string => {
     if (!dateString) return "Not available";
     const date = new Date(dateString);
     return date.toLocaleDateString("en-GB", {
@@ -160,18 +145,7 @@ const ManagerDashboard: React.FC = () => {
   };
 
   const getServiceType = (appointment: any): string => {
-    if (appointment.serviceType) {
-      return appointment.serviceType;
-    }
-    if (appointment.tasks && appointment.tasks.length > 0) {
-      const firstTask = appointment.tasks[0];
-      if (typeof firstTask === "string") {
-        return firstTask;
-      } else if (firstTask && typeof firstTask === "object") {
-        return firstTask.description || firstTask.Description || "N/A";
-      }
-    }
-    return "N/A";
+    return appointment.serviceType || "N/A";
   };
 
   const handleViewPatient = (patient: PatientDTO) => {
@@ -185,14 +159,19 @@ const ManagerDashboard: React.FC = () => {
   };
 
   const handleViewAppointment = async (appointment: AppointmentDTO) => {
-    try {
-      const details = await appointmentRequests.getById(appointment.id);
-      setSelectedAppointment(details);
-      setShowAppointmentModal(true);
-    } catch (err: unknown) {
-      console.error("Error loading appointment details:", err);
-      setSelectedAppointment(appointment);
-      setShowAppointmentModal(true);
+    setSelectedAppointment(appointment);
+    setShowAppointmentModal(true);
+    if (appointment.patientId) {
+      setLoadingPatient(true);
+      setPatientInfo(null);
+      try {
+        const patient = await patientRequests.getById(appointment.patientId);
+        setPatientInfo(patient);
+      } catch (err: any) {
+        console.error("Failed to load patient information:", err);
+      } finally {
+        setLoadingPatient(false);
+      }
     }
   };
 
@@ -318,12 +297,15 @@ const ManagerDashboard: React.FC = () => {
         }}
       />
 
-      <AppointmentModal
+      <AppointmentDetailsModal
         isOpen={showAppointmentModal}
         appointment={selectedAppointment}
+        patientInfo={patientInfo}
+        loadingPatient={loadingPatient}
         onClose={() => {
           setShowAppointmentModal(false);
           setSelectedAppointment(null);
+          setPatientInfo(null);
         }}
         formatDate={formatDate}
       />

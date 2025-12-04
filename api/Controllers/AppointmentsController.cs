@@ -126,14 +126,12 @@ namespace CareCenter.Controllers
                 {
                     a.Id,
                     a.Status,
+                    a.ServiceType,
                     Date = a.Availability.Date,
                     WorkerName = a.Availability.HealthcareWorker.FullName,
                     a.PatientId,
-                    a.VisitNote,
-                    Tasks = a.Tasks.Select(t => new { t.Description, t.Done }),
-                    // Include time information like in GetAll method
-                    StartTime = FormatTimeSpan(a.SelectedStartTime ?? a.Availability?.StartTime),
-                    SelectedStartTime = FormatTimeSpan(a.SelectedStartTime)
+                    SelectedStartTime = FormatTimeSpan(a.SelectedStartTime),
+                    SelectedEndTime = FormatTimeSpan(a.SelectedEndTime)
                 });
 
                 return Ok(result);
@@ -173,20 +171,15 @@ namespace CareCenter.Controllers
                 {
                     a.Id,
                     a.Status,
+                    a.ServiceType,
                     a.PatientId,
                     PatientName = patients.ContainsKey(a.PatientId) ? patients[a.PatientId].FullName : "Unknown",
                     PatientEmail = patients.ContainsKey(a.PatientId) ? patients[a.PatientId].Email : "",
                     WorkerName = a.Availability?.HealthcareWorker?.FullName ?? "Unknown",
                     WorkerEmail = a.Availability?.HealthcareWorker?.Email ?? "",
                     Date = a.Availability?.Date ?? default(DateTime),
-                    // Use selected times if available, otherwise use availability times
-                    // Format TimeSpan as string "HH:mm:ss" for consistent serialization
-                    StartTime = FormatTimeSpan(a.SelectedStartTime ?? a.Availability?.StartTime),
-                    EndTime = FormatTimeSpan(a.SelectedEndTime ?? a.Availability?.EndTime),
                     SelectedStartTime = FormatTimeSpan(a.SelectedStartTime),
                     SelectedEndTime = FormatTimeSpan(a.SelectedEndTime),
-                    Tasks = a.Tasks?.Select(t => t.Description) ?? Enumerable.Empty<string>(),
-                    a.VisitNote,
                     a.CreatedAt,
                     AvailabilityId = a.AvailabilityId,
                     Availability = a.Availability != null ? new

@@ -14,7 +14,7 @@ import ConfirmationModal from "../../components/shared/ConfirmationModal";
 import AvailabilityFormModal from "../../components/worker/AvailabilityFormModal";
 import AvailabilityTable from "../../components/worker/AvailabilityTable";
 import AppointmentTable from "../../components/worker/AppointmentTable";
-import AppointmentDetailsModal from "../../components/worker/AppointmentDetailsModal";
+import AppointmentDetailsModal from "../../components/shared/AppointmentDetailsModal";
 import "../../css/Worker.css";
 
 // Main dashboard for healthcare workers to manage availability and appointments
@@ -39,17 +39,9 @@ const WorkerDashboard: React.FC = () => {
     availabilityId: number | null;
   }>({ isOpen: false, availabilityId: null });
 
-  const [appointments, setAppointments] = useState<
-    (AppointmentDTO & {
-      tasks?: Array<{ description: string; done: boolean }>;
-    })[]
-  >([]);
-  const [selectedAppointment, setSelectedAppointment] = useState<
-    | (AppointmentDTO & {
-        tasks?: Array<{ description: string; done: boolean }>;
-      })
-    | null
-  >(null);
+  const [appointments, setAppointments] = useState<AppointmentDTO[]>([]);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<AppointmentDTO | null>(null);
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [patientInfo, setPatientInfo] = useState<PatientDTO | null>(null);
   const [loadingPatient, setLoadingPatient] = useState(false);
@@ -108,18 +100,25 @@ const WorkerDashboard: React.FC = () => {
   const loadAppointments = async (id: number) => {
     try {
       const data = await appointmentRequests.getByWorker(id);
-      const mappedAppointments: (AppointmentDTO & {
-        tasks?: Array<{ description: string; done: boolean }>;
-      })[] = data.map((item) => ({
-        ...item,
-        workerId: id,
-        appointmentDate: item.date || item.appointmentDate,
-        appointmentTime:
-          item.selectedStartTime ||
-          item.availability?.startTime ||
-          item.appointmentTime ||
-          "", // Use the time from API response
-      }));
+      const mappedAppointments: AppointmentDTO[] = data.map((item) => {
+        // Format display time from selectedStartTime and selectedEndTime
+        let appointmentTime = "";
+        if (item.selectedStartTime) {
+          const start = formatTime(item.selectedStartTime);
+          if (item.selectedEndTime) {
+            const end = formatTime(item.selectedEndTime);
+            appointmentTime = `${start} - ${end}`;
+          } else {
+            appointmentTime = start;
+          }
+        }
+
+        return {
+          ...item,
+          workerId: id,
+          appointmentTime: appointmentTime,
+        };
+      });
       setAppointments(mappedAppointments);
     } catch (err: any) {
       console.error("Failed to load appointments:", err);
@@ -495,16 +494,12 @@ const WorkerDashboard: React.FC = () => {
 
   const getAppointmentForAvailability = (
     availability: AvailabilityDTO
-  ):
-    | (AppointmentDTO & {
-        tasks?: Array<{ description: string; done: boolean }>;
-      })
-    | undefined => {
+  ): AppointmentDTO | undefined => {
     if (!availability.isBooked || !availability.date) return undefined;
     const availabilityDateStr = availability.date.split("T")[0];
     return appointments.find((apt) => {
-      if (!apt.appointmentDate) return false;
-      const appointmentDateStr = apt.appointmentDate.split("T")[0];
+      if (!apt.date) return false;
+      const appointmentDateStr = apt.date.split("T")[0];
       return appointmentDateStr === availabilityDateStr;
     });
   };

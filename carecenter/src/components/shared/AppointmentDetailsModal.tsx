@@ -26,16 +26,6 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
 }) => {
   if (!isOpen || !appointment) return null;
 
-  const getStatusBadge = (status: string | undefined) => {
-    const statusLower = (status || "Pending").toLowerCase();
-    if (statusLower === "approved") return "badge-success";
-    if (statusLower === "pending") return "badge-warning";
-    if (statusLower === "rejected") return "badge-danger";
-    if (statusLower === "cancelled" || statusLower === "completed")
-      return "badge-secondary";
-    return "badge-info";
-  };
-
   return (
     <Modal show={isOpen} onHide={onClose} size="lg" centered>
       <Modal.Header closeButton>
@@ -111,10 +101,7 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
             )}
           </div>
           <p>
-            <strong>Status:</strong>{" "}
-            <span className={`badge ${getStatusBadge(appointment.status)}`}>
-              {appointment.status || "Pending"}
-            </span>
+            <strong>Status:</strong> <span>{appointment.status}</span>
           </p>
           <p>
             <strong>Patient ID:</strong> {appointment.patientId}
@@ -133,32 +120,6 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
             <p>
               <strong>Service Type:</strong> {appointment.serviceType}
             </p>
-          )}
-
-          {appointment.tasks && appointment.tasks.length > 0 && (
-            <div>
-              <strong>Tasks:</strong>
-              <ul className="list-group mt-2">
-                {appointment.tasks.map((task, idx) => (
-                  <li
-                    key={idx}
-                    className="list-group-item d-flex align-items-center"
-                    style={{
-                      textDecoration: task.done ? "line-through" : "none",
-                      color: task.done ? "#6c757d" : "inherit",
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={task.done}
-                      readOnly
-                      className="me-2"
-                    />
-                    {task.description}
-                  </li>
-                ))}
-              </ul>
-            </div>
           )}
         </div>
       </Modal.Body>

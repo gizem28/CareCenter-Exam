@@ -192,30 +192,7 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
   useEffect(() => {
     if (isOpen && appointment) {
       // Set initial service type from appointment
-      if (appointment.tasks && appointment.tasks.length > 0) {
-        const firstTask = appointment.tasks[0];
-        if (typeof firstTask === "string") {
-          const taskString = firstTask as string;
-          const serviceType = serviceTypes.find(
-            (st) => st === taskString || st === taskString.replace(/\s/g, "")
-          );
-          if (serviceType) {
-            setSelectedServiceType(serviceType);
-          }
-        } else if (firstTask && typeof firstTask === "object") {
-          const taskDescription =
-            firstTask.description || (firstTask as any).Description || "";
-          const serviceType = serviceTypes.find(
-            (st) =>
-              st === taskDescription ||
-              st === taskDescription.replace(/\s/g, "") ||
-              st.toLowerCase() === taskDescription.toLowerCase()
-          );
-          if (serviceType) {
-            setSelectedServiceType(serviceType);
-          }
-        }
-      } else if (appointment.serviceType) {
+      if (appointment.serviceType) {
         const serviceType = serviceTypes.find(
           (st) =>
             st === appointment.serviceType ||

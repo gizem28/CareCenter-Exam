@@ -130,34 +130,13 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
     }
   };
 
-  // Get service type from tasks array (first task is usually the service type)
   const getServiceType = (appointment: AppointmentDTO): string => {
-    let serviceType = "";
-    if (appointment.serviceType) {
-      serviceType = appointment.serviceType;
-    } else if (appointment.tasks && appointment.tasks.length > 0) {
-      const firstTask = appointment.tasks[0];
-      // Handle both object format {description: string} and string format
-      if (typeof firstTask === "string") {
-        serviceType = firstTask;
-      } else if (firstTask && typeof firstTask === "object") {
-        serviceType =
-          firstTask.description || (firstTask as any).Description || "N/A";
-      }
-    } else {
-      return "N/A";
-    }
-
-    // Format service type: "Medical Care" instead of "MedicalCare"
-    return serviceType.replace(/([A-Z])/g, " $1").trim();
+    return appointment.serviceType || "N/A";
   };
 
   // Check if appointment can be deleted (not past or same day)
   const canDeleteAppointment = (appointment: AppointmentDTO): boolean => {
-    const appointmentDate =
-      appointment.date ||
-      appointment.appointmentDate ||
-      appointment.availability?.date;
+    const appointmentDate = appointment.date || appointment.availability?.date;
     if (!appointmentDate) {
       return false;
     }
@@ -200,10 +179,8 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
               {appointments
                 .sort((a, b) => {
                   // Sort by date first, then by time
-                  const dateA =
-                    a.date || a.appointmentDate || a.availability?.date || "";
-                  const dateB =
-                    b.date || b.appointmentDate || b.availability?.date || "";
+                  const dateA = a.date || a.availability?.date || "";
+                  const dateB = b.date || b.availability?.date || "";
 
                   if (dateA && dateB) {
                     const dateCompare =
@@ -237,9 +214,7 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
                   <tr key={appointment.id}>
                     <td>
                       {formatDate(
-                        appointment.date ||
-                          appointment.appointmentDate ||
-                          appointment.availability?.date
+                        appointment.date || appointment.availability?.date
                       )}
                     </td>
                     <td>
