@@ -31,7 +31,6 @@ const PatientsList: React.FC = () => {
   };
 
   const handleDelete = async (patient: PatientDTO) => {
-    // Show confirmation dialog
     const confirmed = window.confirm(
       `Are you sure you want to delete patient "${patient.fullName}" (${patient.email})?\n\nThis action cannot be undone.`
     );
@@ -41,16 +40,13 @@ const PatientsList: React.FC = () => {
     }
 
     setDeletingId(patient.id);
-    // Optimistically remove from list for immediate UI update
     setPatients((prev) => prev.filter((p) => p.id !== patient.id));
 
     try {
       await patientRequests.delete(patient.id);
-      // Reload the list to ensure consistency with server
       await loadPatients();
       setError("");
     } catch (err: any) {
-      // Restore the patient if deletion failed
       await loadPatients();
       const errorMessage =
         err?.response?.data?.message ||

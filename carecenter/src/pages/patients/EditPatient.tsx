@@ -37,11 +37,9 @@ const EditPatient: React.FC = () => {
       setLoadingData(true);
       setError("");
       const patient = await patientRequests.getById(parseInt(id));
-      // Format birthDate for date input (YYYY-MM-DD)
       const birthDate = patient.birthDate
         ? new Date(patient.birthDate).toISOString().split("T")[0]
         : "";
-      // Sanitize phone number - remove any non-digit characters
       const sanitizedPhone = patient.phone.replace(/\D/g, "");
       setFormData({
         ...patient,
@@ -118,11 +116,9 @@ const EditPatient: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    // For phone field, only allow digits
     if (name === "phone") {
       const digitsOnly = value.replace(/\D/g, "");
       setFormData((prev) => ({ ...prev, [name]: digitsOnly }));
-      // Clear validation error for this field when user types
       if (validationErrors.phone) {
         setValidationErrors((prev) => {
           const newErrors = { ...prev };
@@ -132,7 +128,6 @@ const EditPatient: React.FC = () => {
       }
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
-      // Clear validation error for this field when user types
       if (validationErrors[name]) {
         setValidationErrors((prev) => {
           const newErrors = { ...prev };
@@ -148,7 +143,6 @@ const EditPatient: React.FC = () => {
     setError("");
     setSuccess(false);
 
-    // Frontend validation
     if (!validateForm()) {
       return;
     }
@@ -156,7 +150,6 @@ const EditPatient: React.FC = () => {
     setLoading(true);
 
     try {
-      // Sanitize phone number - remove any non-digit characters before sending
       const sanitizedData = {
         ...formData,
         phone: formData.phone.replace(/\D/g, ""),
@@ -164,7 +157,6 @@ const EditPatient: React.FC = () => {
 
       await patientRequests.update(sanitizedData.id, sanitizedData);
       setSuccess(true);
-      // Show success message for 2 seconds before redirecting
       setTimeout(() => {
         navigate("/patients");
       }, 2000);

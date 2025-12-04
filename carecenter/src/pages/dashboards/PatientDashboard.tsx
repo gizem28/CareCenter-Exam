@@ -1,5 +1,3 @@
-// pasient dashboard - viser avtaler og booking
-// hasta paneli - randevularını görür ve yeni randevu alabilir
 import React, { useState, useEffect, useRef } from "react";
 import { Container, Alert, Spinner } from "react-bootstrap";
 import { useAuth } from "../../contexts/AuthContext";
@@ -24,14 +22,13 @@ const PatientDashboard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [loadingPatientId, setLoadingPatientId] = useState(true);
   const [error, setError] = useState<string>("");
-  const submittingRef = useRef(false); // forhindre dobbelt innsending
+  const submittingRef = useRef(false);
   const [welcomeMessage, setWelcomeMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState(false);
   const [deleteSuccessMessage, setDeleteSuccessMessage] = useState(false);
   const [updateSuccessMessage, setUpdateSuccessMessage] = useState(false);
   const [calendarRefreshTrigger, setCalendarRefreshTrigger] = useState(0);
 
-  // hent pasient id fra api
   useEffect(() => {
     const fetchPatientId = async () => {
       if (!user?.email) {
@@ -39,7 +36,6 @@ const PatientDashboard: React.FC = () => {
         return;
       }
 
-      // Only fetch patient ID if user role is Client (Patient) or Patient
       if (
         user.role !== "Client" &&
         user.role !== "client" &&
@@ -52,18 +48,15 @@ const PatientDashboard: React.FC = () => {
       try {
         setLoadingPatientId(true);
 
-        // bruk epost for å hente pasient
         try {
           const patient = await patientRequests.getByEmail(user.email);
 
-          // håndter både camelCase og PascalCase
           const patientIdValue = patient.id || (patient as any).Id;
           if (patientIdValue) {
             setPatientId(patientIdValue);
-            patientIdRef.current = patientIdValue; // Update ref as well
+            patientIdRef.current = patientIdValue;
 
             setError("");
-            // vis velkomst melding
             setWelcomeMessage(true);
             setTimeout(() => {
               setWelcomeMessage(false);
@@ -74,7 +67,6 @@ const PatientDashboard: React.FC = () => {
             );
           }
         } catch (emailError: any) {
-          // hvis epost ikke funker prøv å hente alle
           if (emailError?.response?.status === 404) {
             const patients = await patientRequests.getAll();
             const patient = patients.find((p) => {
@@ -97,7 +89,7 @@ const PatientDashboard: React.FC = () => {
                 }, 3000);
               }
             } else {
-              throw emailError; // Re-throw to show error message
+              throw emailError;
             }
           } else {
             throw emailError;
@@ -117,19 +109,16 @@ const PatientDashboard: React.FC = () => {
     fetchPatientId();
   }, [user]);
 
-  // last avtaler når pasientId er klar
   useEffect(() => {
     if (patientId === null || patientId === 0) {
       return;
     }
 
-    // last med en gang
     const loadImmediately = async () => {
       await loadAppointments(patientId);
     };
     loadImmediately();
 
-    // prøv igjen etter litt tid
     const retryTimer = setTimeout(async () => {
       await loadAppointments(patientId);
     }, 1000);
@@ -137,7 +126,6 @@ const PatientDashboard: React.FC = () => {
     return () => clearTimeout(retryTimer);
   }, [patientId]);
 
-  // hent avtaler for pasient
   const loadAppointments = async (overridePatientId?: number | null) => {
     const idToUse =
       overridePatientId !== undefined ? overridePatientId : patientId;
@@ -157,9 +145,7 @@ const PatientDashboard: React.FC = () => {
         return;
       }
 
-      // transformer data fra backend til frontend format
       const transformedAppointments = data.map((apt: any) => {
-        // håndter både camelCase og PascalCase
         const availability = apt.availability || apt.Availability;
         const availabilityDate = availability?.date || availability?.Date;
         const availabilityStartTime =
@@ -174,7 +160,6 @@ const PatientDashboard: React.FC = () => {
           date: availabilityDate,
           createdAt: apt.createdAt || apt.CreatedAt,
           selectedStartTime: apt.selectedStartTime || apt.SelectedStartTime,
-          // availability objekt med normaliserte feltnavn
           availability: availability
             ? {
                 id: availability.id || availability.Id,
@@ -192,7 +177,6 @@ const PatientDashboard: React.FC = () => {
         };
       });
 
-      // oppdater state med ny data
       setAppointments((prev) => {
         if (JSON.stringify(prev) !== JSON.stringify(transformedAppointments)) {
           return transformedAppointments;
@@ -218,7 +202,7 @@ const PatientDashboard: React.FC = () => {
     selectedTime: string;
   }) => {
     if (submittingRef.current) {
-      return; // Prevent duplicate submissions
+      return;
     }
 
     submittingRef.current = true;
@@ -265,20 +249,18 @@ const PatientDashboard: React.FC = () => {
     submittingRef.current = false;
   };
 
-  // opprett ny avtale via api
   const createAppointment = async (
     request: {
       serviceType: ServiceType;
       availabilityId: number;
       selectedDate: string;
-      selectedTime: string; // Format: "HH:mm - HH:mm"
+      selectedTime: string;
     },
     finalPatientId: number
   ) => {
     try {
       setError("");
 
-      // parse tid streng til riktig format
       let selectedStartTime: string | undefined;
 
       if (request.selectedTime) {
@@ -306,7 +288,6 @@ const PatientDashboard: React.FC = () => {
         setSuccessMessage(false);
       }, 4000);
 
-      // oppdater liste etter litt tid
       setTimeout(async () => {
         await loadAppointments(finalPatientId);
       }, 500);
@@ -346,7 +327,6 @@ const PatientDashboard: React.FC = () => {
 
       await appointmentRequests.update(id, updateData);
       await loadAppointments();
-      // vis suksess melding
       setUpdateSuccessMessage(true);
       setTimeout(() => {
         setUpdateSuccessMessage(false);
@@ -358,19 +338,16 @@ const PatientDashboard: React.FC = () => {
     }
   };
 
-  // slett avtale - sjekk at den ikke er i fortid
   const handleDelete = async (id: number) => {
     try {
       setError("");
 
-      // finn avtale
       const appointment = appointments.find((apt) => apt.id === id);
       if (!appointment) {
         setError("Appointment not found.");
         return;
       }
 
-      // hent dato for avtale
       const appointmentDate =
         appointment.date || appointment.availability?.date;
       if (!appointmentDate) {
@@ -378,11 +355,10 @@ const PatientDashboard: React.FC = () => {
         return;
       }
 
-      // sjekk om avtale er i fortid eller samme dag
       const appointmentDateObj = new Date(appointmentDate);
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // Reset time to start of day
-      appointmentDateObj.setHours(0, 0, 0, 0); // Reset time to start of day
+      today.setHours(0, 0, 0, 0);
+      appointmentDateObj.setHours(0, 0, 0, 0);
 
       if (appointmentDateObj < today) {
         setError("Cannot delete past appointments.");
@@ -397,7 +373,6 @@ const PatientDashboard: React.FC = () => {
       await appointmentRequests.delete(id, "Client");
       await loadAppointments();
 
-      // oppdater kalender
       setCalendarRefreshTrigger((prev) => prev + 1);
 
       setDeleteSuccessMessage(true);
@@ -420,7 +395,6 @@ const PatientDashboard: React.FC = () => {
     setError("");
   };
 
-  // vis loading spinner
   if (loadingPatientId) {
     return (
       <div className="d-flex flex-column justify-content-center align-items-center min-vh-custom">
@@ -448,7 +422,6 @@ const PatientDashboard: React.FC = () => {
             <i className="bi bi-exclamation-circle"></i> {error}
           </Alert>
         )}
-        {/* Success message - positioned at bottom right */}
         {successMessage && (
           <div className="success-message-container">
             <Alert
@@ -461,7 +434,6 @@ const PatientDashboard: React.FC = () => {
             </Alert>
           </div>
         )}
-        {/* Delete success message - positioned at bottom right */}
         {deleteSuccessMessage && (
           <div className="success-message-container">
             <Alert
@@ -474,7 +446,6 @@ const PatientDashboard: React.FC = () => {
             </Alert>
           </div>
         )}
-        {/* Update success message - positioned at bottom right */}
         {updateSuccessMessage && (
           <div className="success-message-container">
             <Alert
@@ -488,7 +459,6 @@ const PatientDashboard: React.FC = () => {
           </div>
         )}
         <div className="dashboard-layout">
-          {/* Left Section: Create Service Request */}
           <div className="dashboard-left">
             <ServiceRequestForm
               onSubmit={handleFormSubmit}
@@ -500,7 +470,6 @@ const PatientDashboard: React.FC = () => {
             />
           </div>
 
-          {/* Right Section: My Appointments */}
           <div className="dashboard-right">
             <ServiceRequestList
               appointments={appointments}
