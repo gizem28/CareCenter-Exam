@@ -182,7 +182,7 @@ const EditWorker: React.FC = () => {
       <div className="row">
         <div className="col-md-8 offset-md-2">
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h3>Edit Healthcare Worker</h3>
+            <h1 className="h3">Edit Healthcare Worker</h1>
             <button
               type="button"
               className="btn btn-outline-secondary"

@@ -77,7 +77,7 @@ const WorkersList: React.FC = () => {
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h3>Healthcare Workers List</h3>
+        <h1 className="h3">Healthcare Workers List</h1>
         <div className="d-flex gap-2">
           <button
             type="button"

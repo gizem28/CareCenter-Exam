@@ -155,12 +155,49 @@
     margin: 0.5rem;
   }
 
+  .modal-dialog {
+    max-width: 90%;
+    margin: 1rem auto;
+  }
+
   .modal-footer {
     flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
   }
 
   .btn-modal {
     width: 100%;
+  }
+
+  .update-appointment-modal .service-type-btn {
+    min-height: 80px;
+    font-size: 0.9rem;
+  }
+
+  .update-appointment-modal .service-type-btn i {
+    font-size: 1.25rem;
+  }
+}
+
+/* Extra small devices (phones, less than 576px) */
+@media (max-width: 575px) {
+  .modal-dialog {
+    max-width: 95%;
+    margin: 0.5rem auto;
+  }
+
+  .update-appointment-modal .service-type-buttons {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .update-appointment-modal .service-type-btn {
+    min-height: 70px;
+    padding: 0.5rem;
   }
 }
 
@@ -213,21 +250,22 @@
 }
 
 .update-appointment-modal .service-type-btn {
-  min-height: 3rem !important;
-  padding: 0.25rem 0.5rem !important;
-  font-size: 1rem !important;
-  height: 100px !important;
-  width: 200px !important;
-  margin: 0.125rem !important;
+  min-height: 90px;
+  padding: 0.75rem 0.5rem;
+  font-size: 0.95rem;
 }
 
 .update-appointment-modal .service-type-btn i {
-  font-size: 1.125rem !important;
-  margin-bottom: 0.125rem !important;
+  font-size: 1.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.update-appointment-modal .service-type-buttons {
+  gap: 0.75rem;
 }
 
 .modal-dialog {
-  max-width: 450px;
+  max-width: 550px;
 }
 
 /* Increase font sizes for Patient Dashboard appointments table */
@@ -282,29 +320,29 @@
 
 /* Light Teal Button */
 .btn-light-teal {
-  background-color: #4db6ac;
-  border-color: #4db6ac;
+  background-color: #00897B;
+  border-color: #00897B;
   color: white;
   transition: all 0.2s ease;
 }
 
 .btn-light-teal:hover:not(:disabled) {
-  background-color: #26a69a;
-  border-color: #26a69a;
+  background-color: #00695C;
+  border-color: #00695C;
   color: white;
 }
 
 .btn-light-teal:active:not(:disabled),
 .btn-light-teal:focus:not(:disabled) {
-  background-color: #00897b;
-  border-color: #00897b;
+  background-color: #00574D;
+  border-color: #00574D;
   color: white;
-  box-shadow: 0 0 0 0.2rem rgba(77, 182, 172, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(0, 137, 123, 0.25);
 }
 
 .btn-light-teal:disabled {
-  background-color: #4db6ac;
-  border-color: #4db6ac;
+  background-color: #00897B;
+  border-color: #00897B;
   opacity: 0.6;
   color: white;
 }
@@ -312,23 +350,23 @@
 /* Outline Teal Button */
 .btn-outline-teal {
   background-color: transparent;
-  border: 1px solid #00897b;
-  color: #00897b;
+  border: 1px solid #00695C;
+  color: #00695C;
   transition: all 0.2s ease;
 }
 
 .btn-outline-teal:hover:not(:disabled),
 .btn-outline-teal:active:not(:disabled),
 .btn-outline-teal:focus:not(:disabled) {
-  background-color: #4db6ac;
-  border-color: #4db6ac;
+  background-color: #00897B;
+  border-color: #00897B;
   color: white;
-  box-shadow: 0 0 0 0.2rem rgba(77, 182, 172, 0.15);
+  box-shadow: 0 0 0 0.2rem rgba(0, 105, 92, 0.15);
 }
 
 .btn-outline-teal:disabled {
-  border-color: #00897b;
-  color: #00897b;
+  border-color: #00695C;
+  color: #00695C;
   opacity: 0.4;
   background-color: transparent;
 }

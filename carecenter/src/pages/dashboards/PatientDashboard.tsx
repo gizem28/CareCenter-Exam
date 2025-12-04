@@ -8,9 +8,9 @@ import {
   type AppointmentCreateDto,
 } from "../../api/appointments";
 import { patientRequests } from "../../api/patients";
-import PatientCalendarForm, {
+import ServiceRequestForm, {
   type ServiceType,
-} from "../../components/patient/PatientCalendarForm";
+} from "../../components/patient/ServiceRequestForm";
 import ServiceRequestList from "../../components/patient/ServiceRequestList";
 
 // Main dashboard for patients - shows appointments and booking form
@@ -330,6 +330,9 @@ const PatientDashboard: React.FC = () => {
         "Failed to create appointment. Please try again.";
       setError(errorMessage);
       throw err;
+    } finally {
+      // Ensure submittingRef is reset even if error occurs
+      submittingRef.current = false;
     }
   };
 
@@ -375,6 +378,10 @@ const PatientDashboard: React.FC = () => {
     } catch (err: any) {
       console.error("Error updating appointment:", err);
       throw err; // Let ServiceRequestList handle the error display
+    } finally {
+      // Reset loading state is handled in ServiceRequestList
+      // But ensure error state is available
+      setLoading(false);
     }
   };
 
@@ -435,6 +442,9 @@ const PatientDashboard: React.FC = () => {
         "Failed to delete appointment.";
       setError(errorMessage);
       throw err; // Let ServiceRequestList handle the error display
+    } finally {
+      // Reset loading state
+      setLoading(false);
     }
   };
 
@@ -514,7 +524,7 @@ const PatientDashboard: React.FC = () => {
         <div className="dashboard-layout">
           {/* Left Section: Create Service Request */}
           <div className="dashboard-left">
-            <PatientCalendarForm
+            <ServiceRequestForm
               onSubmit={handleFormSubmit}
               onCancel={handleCancelForm}
               existingAppointments={appointments

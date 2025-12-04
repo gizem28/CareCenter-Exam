@@ -32,6 +32,7 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
     useState<AppointmentDTO | null>(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [actionError, setActionError] = useState<string>("");
 
   const handleDeleteClick = (appointment: AppointmentDTO) => {
     setSelectedAppointment(appointment);
@@ -43,11 +44,19 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
 
     try {
       setDeletingId(selectedAppointment.id);
+      setActionError("");
       await onDelete(selectedAppointment.id);
       setDeleteModalOpen(false);
       setSelectedAppointment(null);
-    } catch (error) {
-      // Error handling is done in parent component
+      setActionError("");
+    } catch (error: any) {
+      // Display error to user
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to delete appointment. Please try again.";
+      setActionError(errorMessage);
+      console.error("Delete error:", error);
     } finally {
       setDeletingId(null);
     }
@@ -68,6 +77,7 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
 
     try {
       setUpdatingId(selectedAppointment.id);
+      setActionError("");
       await onUpdate(selectedAppointment.id, {
         availabilityId,
         serviceType: serviceType || undefined,
@@ -76,9 +86,16 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
       });
       setUpdateModalOpen(false);
       setSelectedAppointment(null);
-    } catch (error) {
-      // Error handling is done in parent component
-      throw error;
+      setActionError("");
+    } catch (error: any) {
+      // Display error to user
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to update appointment. Please try again.";
+      setActionError(errorMessage);
+      console.error("Update error:", error);
+      // Keep modal open so user can see error and retry
     } finally {
       setUpdatingId(null);
     }
@@ -174,6 +191,18 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
   return (
     <div className="service-request-list">
       <h2 className="h4 text-primary fw-bold mb-3">My Appointments</h2>
+
+      {actionError && (
+        <div className="alert alert-danger alert-dismissible fade show" role="alert">
+          <i className="bi bi-exclamation-circle"></i> {actionError}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setActionError("")}
+            aria-label="Close"
+          ></button>
+        </div>
+      )}
 
       {loading && appointments.length === 0 ? (
         <div className="text-center p-4">
