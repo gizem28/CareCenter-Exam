@@ -6,10 +6,10 @@ namespace CareCenter.Models
     public class AuthUser : IdentityUser
     {
         [Required, MaxLength(120)]
-        public string FullName { get; set; } = string.Empty; // null uyarılarını keser
+        public string FullName { get; set; } = string.Empty;
 
-        // Bu property'yi token claim'i için tutacağız, asıl yetkiyi RoleManager kullanacak.
+        
         [Required, MaxLength(40)]
-        public string Role { get; set; } = "Client"; // Admin / Worker / Client
+        public string Role { get; set; } = "Client"; 
     }
 }

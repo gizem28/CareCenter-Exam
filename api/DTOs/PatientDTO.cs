@@ -3,13 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CareCenter.DTOs
 {
-    // Data transfer object for patient information
-    // Dette brukes for å sende pasient data mellom frontend og backend
+  
     public class PatientDTO
     {
         public int Id { get; set; }
 
-        public string? UserId { get; set; } // Optional for creation, required in database
+        public string? UserId { get; set; } 
 
         [Required(ErrorMessage = "Full name is required")]
         [StringLength(100, ErrorMessage = "Full name cannot exceed 100 characters")]
@@ -32,7 +31,6 @@ namespace CareCenter.DTOs
         [CustomValidation(typeof(PatientDTO), nameof(ValidateBirthDate))]
         public DateTime BirthDate { get; set; }
 
-        // 🔹 Custom validation method (yaş kontrolü gibi)
         public static ValidationResult? ValidateBirthDate(DateTime birthDate, ValidationContext context)
         {
             if (birthDate > DateTime.Now)

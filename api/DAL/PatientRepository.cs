@@ -5,15 +5,14 @@ using Microsoft.AspNetCore.Identity;
 
 namespace CareCenter.DAL
 {
-    // Repository for patient data operations
+   
     public class PatientRepository : IPatientRepository
     {
         private readonly AppDbContext _context;
         private readonly ILogger<PatientRepository> _logger;
         private readonly UserManager<AuthUser> _userManager;
 
-        // Constructor with database context and user manager
-        // Dette kobler opp databasen og brukerhåndteringstjenesten
+        
         public PatientRepository(AppDbContext context, ILogger<PatientRepository> logger, UserManager<AuthUser> userManager)
         {
             _context = context;
@@ -47,7 +46,7 @@ namespace CareCenter.DAL
         }
 
         // ---------------- GET BY ID ----------------
-        // Find patient by their unique ID number
+       
         public async Task<PatientDTO?> GetByIdAsync(int id)
         {
             try
@@ -102,12 +101,12 @@ namespace CareCenter.DAL
         }
 
         // ---------------- ADD ----------------
-        // Add new patient record - requires valid UserId from AuthUser
+      
         public async Task<PatientDTO> AddAsync(PatientDTO dto)
         {
             try
             {
-                // Validate UserId exists
+                
                 if (string.IsNullOrEmpty(dto.UserId))
                     throw new InvalidOperationException("UserId is required. Patient must be linked to an AuthUser.");
 
@@ -115,7 +114,7 @@ namespace CareCenter.DAL
                 if (authUser == null)
                     throw new InvalidOperationException($"AuthUser with ID {dto.UserId} not found.");
 
-                // ✅ Duplicate kontrolü - only check for UserId conflicts (one patient per user)
+            
                 var exists = await _context.Patients.AnyAsync(p => p.UserId == dto.UserId);
 
                 if (exists)
@@ -150,7 +149,7 @@ namespace CareCenter.DAL
         }
 
         // ---------------- UPDATE ----------------
-        // Update existing patient information in database
+      
         public async Task<bool> UpdateAsync(PatientDTO dto)
         {
             try
@@ -182,13 +181,13 @@ namespace CareCenter.DAL
                 var patient = await _context.Patients.FindAsync(id);
                 if (patient == null) return false;
 
-                // Get all appointments for this patient, including their tasks
+               
                 var appointments = await _context.Appointments
                     .Include(apt => apt.Tasks)
                     .Where(apt => apt.PatientId == id)
                     .ToListAsync();
 
-                // Delete all appointment tasks first
+          
                 foreach (var appointment in appointments)
                 {
                     if (appointment.Tasks != null && appointment.Tasks.Any())
@@ -197,23 +196,20 @@ namespace CareCenter.DAL
                     }
                 }
 
-                // Delete all appointments for this patient
+               
                 if (appointments.Any())
                 {
                     _context.Appointments.RemoveRange(appointments);
                 }
 
-                // Save changes to delete appointments first
+               
                 await _context.SaveChangesAsync();
 
-                // Store UserId before deleting patient
                 var userId = patient.UserId;
 
-                // Delete the patient first
                 _context.Patients.Remove(patient);
                 await _context.SaveChangesAsync();
 
-                // Delete the associated AuthUser (cascade delete would have handled it, but we do it explicitly for clarity)
                 if (!string.IsNullOrEmpty(userId))
                 {
                     var authUser = await _userManager.FindByIdAsync(userId);
@@ -224,7 +220,6 @@ namespace CareCenter.DAL
                         {
                             _logger.LogWarning("Failed to delete AuthUser for patient {PatientId}: {Errors}", 
                                 id, string.Join(", ", deleteResult.Errors.Select(e => e.Description)));
-                            // Don't throw - patient is already deleted
                         }
                     }
                 }

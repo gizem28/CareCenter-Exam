@@ -15,7 +15,7 @@ namespace CareCenter.DAL
 
         public async Task<Appointment> CreateAsync(AppointmentCreateDto dto)
         {
-            // Availability kontrolü
+        
             var availability = await _context.Availabilities
                 .Include(a => a.Appointment)
                 .FirstOrDefaultAsync(a => a.Id == dto.AvailabilityId);
@@ -26,7 +26,6 @@ namespace CareCenter.DAL
             if (availability.Appointment != null)
                 throw new InvalidOperationException("This availability is already booked.");
 
-            // Convert string times to TimeSpan if provided
             TimeSpan? selectedStartTime = null;
             TimeSpan? selectedEndTime = null;
 
@@ -88,7 +87,6 @@ namespace CareCenter.DAL
             if (appointment == null)
                 return null;
 
-            // Admin worker değiştirmek isterse → AvailabilityId güncelle
             if (dto.AvailabilityId.HasValue)
             {
                 var newAvailability = await _context.Availabilities
@@ -98,9 +96,6 @@ namespace CareCenter.DAL
                 if (newAvailability == null)
                     throw new InvalidOperationException("New availability not found.");
 
-                // Allow updating if:
-                // 1. It's the same availability (current appointment), OR
-                // 2. The availability has no other appointment
                 if (newAvailability.Appointment != null && newAvailability.Appointment.Id != appointment.Id)
                     throw new InvalidOperationException("This worker's availability is already booked.");
 
@@ -113,13 +108,12 @@ namespace CareCenter.DAL
             if (!string.IsNullOrEmpty(dto.VisitNote))
                 appointment.VisitNote = dto.VisitNote;
 
-            // Update tasks if provided
             if (dto.Tasks != null && dto.Tasks.Any())
             {
-                // Clear existing tasks
+              
                 _context.AppointmentTasks.RemoveRange(appointment.Tasks);
 
-                // Add new tasks
+            
                 foreach (var task in dto.Tasks)
                 {
                     appointment.Tasks.Add(new AppointmentTask
@@ -131,7 +125,6 @@ namespace CareCenter.DAL
                 }
             }
 
-            // Update selected times if provided
             if (!string.IsNullOrEmpty(dto.SelectedStartTime))
             {
                 if (TimeSpan.TryParse(dto.SelectedStartTime, out var startTime))
@@ -161,7 +154,6 @@ namespace CareCenter.DAL
             if (appointment == null)
                 return false;
 
-            // Admin "Reject" etmek isterse sadece status değiştir
             if (role == "Admin")
             {
                 appointment.Status = "Rejected";
@@ -169,7 +161,6 @@ namespace CareCenter.DAL
                 return true;
             }
 
-            // Patient ise sadece kendi randevusunu iptal eder
             if (role == "Patient")
             {
                 appointment.Status = "Cancelled";
@@ -177,7 +168,6 @@ namespace CareCenter.DAL
                 return true;
             }
 
-            // Admin gerçekten tamamen silmek isterse (isteğe bağlı)
             _context.Appointments.Remove(appointment);
             await _context.SaveChangesAsync();
             return true;
@@ -230,8 +220,6 @@ namespace CareCenter.DAL
             if (appointment == null)
                 return null;
 
-            // Delete the appointment to release the availability slot
-            // The availability will become available again for booking
             _context.Appointments.Remove(appointment);
             await _context.SaveChangesAsync();
 

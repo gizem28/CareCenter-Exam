@@ -6,7 +6,7 @@ namespace CareCenter.DTOs
     {
         public int Id { get; set; }
 
-        public string? UserId { get; set; } // Optional for creation, required in database
+        public string? UserId { get; set; } 
 
         [Required(ErrorMessage = "Full name is required")]
         [StringLength(100, ErrorMessage = "Full name cannot exceed 100 characters")]
@@ -23,8 +23,6 @@ namespace CareCenter.DTOs
         [Required(ErrorMessage = "Position is required")]
         public string Position { get; set; } = string.Empty;
 
-        // Optional password for worker account creation
-        // If not provided, a secure random password will be generated
         [MinLength(6, ErrorMessage = "Password must be at least 6 characters")]
         public string? Password { get; set; }
     }

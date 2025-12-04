@@ -22,8 +22,7 @@ namespace CareCenter.Controllers
             _roleManager = roleManager;
         }
 
-        // ✅ GET: api/patients
-        // Returns all patients in the system
+        //  GET: api/patients
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PatientDTO>>> GetAll()
         {
@@ -38,7 +37,7 @@ namespace CareCenter.Controllers
             }
         }
 
-        // ✅ GET: api/patients/{id}
+        //  GET: api/patients/{id}
         [HttpGet("{id:int}")]
         public async Task<ActionResult<PatientDTO>> GetById(int id)
         {
@@ -56,7 +55,7 @@ namespace CareCenter.Controllers
             }
         }
 
-        // ✅ GET: api/patients/email/{email}
+        //  GET: api/patients/email/{email}
         [HttpGet("email/{email}")]
         public async Task<ActionResult<PatientDTO>> GetByEmail(string email)
         {
@@ -74,7 +73,7 @@ namespace CareCenter.Controllers
             }
         }
 
-        // ✅ POST: api/patients
+        //  POST: api/patients
         [HttpPost]
         public async Task<ActionResult<PatientDTO>> Add([FromBody] PatientDTO dto)
         {
@@ -83,20 +82,20 @@ namespace CareCenter.Controllers
 
             try
             {
-                // UserId is required - patients must be created via AuthController.RegisterPatient first
+           
                 if (string.IsNullOrEmpty(dto.UserId))
                 {
                     return BadRequest(new { message = "UserId is required. Patients must register via the authentication endpoint first." });
                 }
 
-                // Validate that the AuthUser exists
+                
                 var authUser = await _userManager.FindByIdAsync(dto.UserId);
                 if (authUser == null)
                 {
                     return BadRequest(new { message = $"AuthUser with ID {dto.UserId} not found." });
                 }
 
-                // Ensure the AuthUser has the Patient role
+              
                 if (!await _userManager.IsInRoleAsync(authUser, "Patient"))
                 {
                     return BadRequest(new { message = $"User {dto.UserId} is not registered as a Patient." });
@@ -119,7 +118,7 @@ namespace CareCenter.Controllers
             }
         }
 
-        // ✅ PUT: api/patients/{id}
+        //  PUT: api/patients/{id}
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] PatientDTO dto)
         {
@@ -147,7 +146,7 @@ namespace CareCenter.Controllers
             }
         }
 
-        // ✅ DELETE: api/patients/{id}
+        //  DELETE: api/patients/{id}
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
