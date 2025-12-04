@@ -10,11 +10,9 @@ const Home: React.FC = () => {
   const getUserType = (): string | null => {
     if (!user) return null;
     const role = user.role || "";
-    // Map React app roles (capitalized) to Razor view roles (lowercase)
     if (role === "Admin") return "admin";
     if (role === "Worker") return "staff";
     if (role === "Client") return "patient";
-    // Fallback for lowercase roles
     const roleLower = role.toLowerCase();
     if (roleLower === "admin") return "admin";
     if (roleLower === "worker") return "staff";
@@ -38,7 +36,6 @@ const Home: React.FC = () => {
     return "";
   };
 
-  // Show loading state while checking authentication
   if (isLoading) {
     return (
       <div
@@ -52,21 +49,15 @@ const Home: React.FC = () => {
     );
   }
 
-  // Additional check: ensure user data is valid
-  // This helps catch cases where localStorage has stale/invalid data
   const actuallyAuthenticated =
-    isAuthenticated && user && user.email && user.role && user.fullName; // Ensure fullName exists too
+    isAuthenticated && user && user.email && user.role && user.fullName;
 
   return (
     <>
-      {/* ------------------- MAIN CONTENT ------------------- */}
       <main className="pb-2">
-        {/* HEADER / HERO SECTION */}
         <section className="section py-3">
           <div className="container">
             <div className="row align-items-center g-5">
-              {/* ------------------- LEFT COLUMN ------------------- */}
-              {/* Main heading and subtext */}
               <div className="col-lg-6 text-lg-start text-center">
                 <h1 className="fw-bold display-5 lh-sm mb-3">
                   <span className="text-teal">Easy appointment management</span>
@@ -79,8 +70,6 @@ const Home: React.FC = () => {
                 </p>
               </div>
 
-              {/* ------------------- RIGHT COLUMN ------------------- */}
-              {/* Hero image (illustration of healthcare service) */}
               <div className="col-lg-6 text-center">
                 <img
                   src="/images/hero.webp"
@@ -88,7 +77,6 @@ const Home: React.FC = () => {
                   className="img-fluid rounded-3 shadow-sm"
                   style={{ maxWidth: "80%", height: "auto" }}
                   onError={(e) => {
-                    // Fallback if image doesn't exist
                     e.currentTarget.style.display = "none";
                   }}
                 />
@@ -98,7 +86,6 @@ const Home: React.FC = () => {
         </section>
 
         {!actuallyAuthenticated ? (
-          /* ROLE SELECTION SECTION - Only show when not logged in */
           <section className="section section-muted">
             <div className="container">
               <div className="text-center mb-3">
@@ -106,7 +93,6 @@ const Home: React.FC = () => {
               </div>
 
               <div className="row g-4">
-                {/* ------------------- PATIENT CARD ------------------- */}
                 <div className="col-md-6">
                   <div className="card card-elev h-100">
                     <div className="card-body">
@@ -129,7 +115,6 @@ const Home: React.FC = () => {
                   </div>
                 </div>
 
-                {/* ------------------- HEALTHCARE PERSONNEL CARD ------------------- */}
                 <div className="col-md-6">
                   <div className="card card-elev h-100">
                     <div className="card-body">
@@ -155,7 +140,6 @@ const Home: React.FC = () => {
             </div>
           </section>
         ) : (
-          /* WELCOME SECTION - Show when logged in */
           <section className="section section-muted">
             <div className="container">
               <div className="text-center mb-4">

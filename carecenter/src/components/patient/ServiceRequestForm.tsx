@@ -41,22 +41,19 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
   const [loading] = useState(false);
   const [error, setError] = useState<string>("");
   const [loadingDates, setLoadingDates] = useState(false);
-  const submittingRef = useRef(false); // Prevent duplicate submissions
+  const submittingRef = useRef(false);
 
   const formatDateToLocalString = (date: Date): string => {
-    // Create date string from local date components to avoid timezone conversion issues
-    // Since availability dates are stored as date-only (not datetime), we want the date as the user sees it
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
-  // Generate next 20 days after today
   const next20Days = useMemo(() => {
     const dates: Date[] = [];
     const startDate = new Date(today);
-    startDate.setDate(today.getDate() + 1); // Start from tomorrow
+    startDate.setDate(today.getDate() + 1);
 
     for (let i = 0; i < 20; i++) {
       const date = new Date(startDate);
@@ -66,12 +63,10 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
     return dates;
   }, [today]);
 
-  // Filter out already booked availabilities
   const unbookedAvailabilities = useMemo(() => {
     return availableDates.filter((a) => !existingAppointments.includes(a.id));
   }, [availableDates, existingAppointments]);
 
-  // Get available dates from next 20 days that have unbooked availabilities
   const availableDatesForSelect = useMemo(() => {
     return next20Days.filter((date) => {
       const dateStr = formatDateToLocalString(date);
@@ -83,7 +78,6 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
     });
   }, [next20Days, unbookedAvailabilities]);
 
-  // Parse TimeSpan string (HH:mm:ss) to hours and minutes
   const parseTimeSpan = (
     timeSpan: string | undefined
   ): { hours: number; minutes: number } | null => {
@@ -103,7 +97,6 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
     return null;
   };
 
-  // Get time slots for selected date
   const getTimeSlots = (): string[] => {
     if (!selectedAvailability) return [];
 
@@ -111,7 +104,6 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
     const endTime = parseTimeSpan(selectedAvailability.endTime);
 
     if (!startTime || !endTime) {
-      // Default: 8:00 to 18:00
       return Array.from({ length: 11 }, (_, i) => {
         const hour = 8 + i;
         return `${hour.toString().padStart(2, "0")}:00`;
@@ -136,7 +128,6 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
     loadAvailableDates();
   }, []);
 
-  // Refresh calendar when refreshTrigger changes
   useEffect(() => {
     if (refreshTrigger > 0) {
       loadAvailableDates();
@@ -161,10 +152,8 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
   };
 
   const handleDateSelect = (dateStr: string) => {
-    // Clear any previous error when selecting a new date
     setError("");
 
-    // Find ALL availabilities for this date (multiple workers)
     const availabilitiesForDate = unbookedAvailabilities.filter((a) => {
       if (!a.date) return false;
       const availabilityDateStr = a.date.split("T")[0];
@@ -175,7 +164,6 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
       const selectedDateObj = new Date(dateStr);
       setSelectedDate(selectedDateObj);
       setAvailableWorkersForDate(availabilitiesForDate);
-      // If only one worker, auto-select it; otherwise let user choose
       if (availabilitiesForDate.length === 1) {
         setSelectedAvailability(availabilitiesForDate[0]);
       } else {
@@ -196,12 +184,10 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
     e.preventDefault();
     setError("");
 
-    // Prevent duplicate submissions
     if (submittingRef.current) {
       return;
     }
 
-    // Validation
     if (!serviceType) {
       setError("Please select a service type.");
       return;
@@ -235,7 +221,6 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
       return;
     }
 
-    // Use start time as the selected time
     onSubmit({
       serviceType,
       availabilityId: selectedAvailability.id,
@@ -243,7 +228,6 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
       selectedTime: selectedStartTime,
     });
 
-    // Reset form after submission
     setTimeout(() => {
       setServiceType(null);
       setSelectedDate(null);
@@ -251,7 +235,7 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
       setSelectedAvailability(null);
       setSelectedStartTime("");
       submittingRef.current = false;
-      loadAvailableDates(); // Reload to update available dates
+      loadAvailableDates();
     }, 100);
   };
 
@@ -262,8 +246,7 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
         Please select the service you need from below and choose an available date and time.
       </p>
 
-      <Form onSubmit={handleSubmit}>
-        {/* Service Type Selection */}
+        <Form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label className="form-label fw-semibold">Select Service Type</label>
           <div className="service-type-buttons">
@@ -317,7 +300,6 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
           </div>
         </div>
 
-        {/* Date Selection */}
         <div>
           {error && (
             <Alert variant="danger" dismissible onClose={() => setError("")}>
@@ -333,7 +315,6 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
               if (e.target.value) {
                 handleDateSelect(e.target.value);
               } else {
-                // Clear selection
                 setSelectedDate(null);
                 setAvailableWorkersForDate([]);
                 setSelectedAvailability(null);
@@ -375,7 +356,6 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
           )}
         </div>
 
-        {/* Worker Selection - Show when multiple workers available */}
         {selectedDate && availableWorkersForDate.length > 1 && (
           <div className="mt-3">
             <label className="form-label fw-semibold">
@@ -413,7 +393,6 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
           </div>
         )}
 
-        {/* Show worker name and position when only one worker is available */}
         {selectedDate && availableWorkersForDate.length == 1 && (
           <div className="mt-3">
             <div className="mb-1">
@@ -428,7 +407,6 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
             )}
           </div>
         )}
-        {/* Time Selection - Show when date is selected and worker is chosen */}
         {selectedAvailability && (
           <div className="mt-3">
             <label className="form-label fw-semibold">Select Time :</label>
@@ -456,7 +434,6 @@ const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({
           </div>
         )}
 
-        {/* Action Buttons */}
         <div className="d-flex gap-3 mt-4">
           <Button
             type="submit"

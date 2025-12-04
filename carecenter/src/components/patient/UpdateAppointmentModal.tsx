@@ -47,22 +47,17 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
     "Personal Care",
   ];
 
-  // Filter out already booked availabilities (except current appointment)
   const unbookedAvailabilities = useMemo(() => {
-    // Always include the current appointment's availability if it exists
     const currentAvailabilityId = appointment?.availabilityId;
 
     return availableDates.filter((a) => {
-      // Always include current appointment's availability
       if (currentAvailabilityId && a.id === currentAvailabilityId) {
         return true;
       }
-      // Include all unbooked availabilities
       return true;
     });
   }, [availableDates, appointment]);
 
-  // Parse TimeSpan string (HH:mm:ss) to hours and minutes
   const parseTimeSpan = (
     timeSpan: string | undefined
   ): { hours: number; minutes: number } | null => {
@@ -82,7 +77,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
     return null;
   };
 
-  // Get time slots for selected date
   const getTimeSlots = (): string[] => {
     if (!selectedAvailability) {
       return Array.from({ length: 11 }, (_, i) => {
@@ -116,19 +110,16 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
   const timeSlots = useMemo(() => getTimeSlots(), [selectedAvailability]);
 
   const formatDateToLocalString = (date: Date): string => {
-    // Create date string from local date components to avoid timezone conversion issues
-    // Since availability dates are stored as date-only (not datetime), we want the date as the user sees it
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
-  // Generate next 20 days after today
   const next20Days = useMemo(() => {
     const dates: Date[] = [];
     const startDate = new Date(today);
-    startDate.setDate(today.getDate() + 1); // Start from tomorrow
+    startDate.setDate(today.getDate() + 1);
 
     for (let i = 0; i < 20; i++) {
       const date = new Date(startDate);
@@ -138,7 +129,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
     return dates;
   }, [today]);
 
-  // Get available dates from next 20 days that have unbooked availabilities
   const availableDatesForSelect = useMemo(() => {
     return next20Days.filter((date) => {
       const dateStr = formatDateToLocalString(date);
@@ -151,10 +141,8 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
   }, [next20Days, unbookedAvailabilities]);
 
   const handleDateSelect = (dateStr: string) => {
-    // Clear any previous error when selecting a new date
     setError("");
 
-    // Find ALL availabilities for this date (multiple workers)
     const availabilitiesForDate = unbookedAvailabilities.filter((a) => {
       if (!a.date) return false;
       const availabilityDateStr = a.date.split("T")[0];
@@ -165,7 +153,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
       const selectedDateObj = new Date(dateStr);
       setSelectedDate(selectedDateObj);
       setAvailableWorkersForDate(availabilitiesForDate);
-      // If only one worker, auto-select it; otherwise let user choose
       if (availabilitiesForDate.length === 1) {
         setSelectedAvailability(availabilitiesForDate[0]);
       } else {
@@ -190,7 +177,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
 
   useEffect(() => {
     if (isOpen && appointment) {
-      // Set initial service type from appointment
       if (appointment.serviceType) {
         const serviceType = serviceTypes.find(
           (st) =>
@@ -202,13 +188,11 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
         }
       }
 
-      // Set initial date and times immediately
       if (appointment.availability?.date) {
         const aptDate = new Date(appointment.availability.date);
         if (!isNaN(aptDate.getTime())) {
           setSelectedDate(aptDate);
 
-          // Set time immediately from appointment data
           const startTime =
             appointment.selectedStartTime ||
             (appointment as any).SelectedStartTime ||
@@ -221,7 +205,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
             }
           }
 
-          // Set available workers for the selected date (only if availableDates is loaded)
           if (availableDates.length > 0) {
             const dateStr = formatDateToLocalString(aptDate);
             const availabilitiesForDate = availableDates.filter((a) => {
@@ -231,7 +214,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
             });
             setAvailableWorkersForDate(availabilitiesForDate);
 
-            // Set selected availability - prefer current appointment's availability if available
             if (availabilitiesForDate.length > 0) {
               if (appointment.availabilityId) {
                 const currentAvailability = availabilitiesForDate.find(
@@ -240,11 +222,9 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
                 if (currentAvailability) {
                   setSelectedAvailability(currentAvailability);
                 } else {
-                  // Fallback to first availability
                   setSelectedAvailability(availabilitiesForDate[0]);
                 }
               } else {
-                // Fallback to first availability
                 setSelectedAvailability(availabilitiesForDate[0]);
               }
             }
@@ -252,7 +232,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
         }
       }
     } else if (isOpen) {
-      // Reset form when modal opens without appointment
       setSelectedDate(null);
       setSelectedAvailability(null);
       setSelectedStartTime("");
@@ -261,7 +240,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
     }
   }, [isOpen, appointment]);
 
-  // Set selected availability when availableDates loads and appointment has a date
   useEffect(() => {
     if (
       isOpen &&
@@ -270,7 +248,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
       selectedDate &&
       !selectedAvailability
     ) {
-      // Try to find the availability for the selected date
       const dateStr = formatDateToLocalString(selectedDate);
       const availabilitiesForDate = availableDates.filter((a) => {
         if (!a.date) return false;
@@ -280,22 +257,18 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
 
       if (availabilitiesForDate.length > 0) {
         setAvailableWorkersForDate(availabilitiesForDate);
-        // If only one worker, auto-select it; otherwise prefer the current appointment's availability
         if (availabilitiesForDate.length === 1) {
           setSelectedAvailability(availabilitiesForDate[0]);
         } else if (appointment.availabilityId) {
-          // Try to find the current appointment's availability
           const currentAvailability = availabilitiesForDate.find(
             (a) => a.id === appointment.availabilityId
           );
           if (currentAvailability) {
             setSelectedAvailability(currentAvailability);
           } else {
-            // Fallback to first availability
             setSelectedAvailability(availabilitiesForDate[0]);
           }
         } else {
-          // Fallback to first availability
           setSelectedAvailability(availabilitiesForDate[0]);
         }
       }
@@ -308,17 +281,14 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
       setError("");
       const dates = await availabilityRequests.getUnbooked();
 
-      // If we have an appointment, also fetch its current availability to include it
       if (appointment?.availabilityId) {
         try {
-          // Get all availabilities and find the current one
           const allAvailabilities = await availabilityRequests.getAll();
           const currentAvailability = allAvailabilities.find(
             (a: any) => a.id === appointment.availabilityId
           );
 
           if (currentAvailability) {
-            // Add current availability to the list if not already present
             const exists = dates.some((d) => d.id === currentAvailability.id);
             if (!exists) {
               setAvailableDates([...dates, currentAvailability]);
@@ -326,7 +296,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
             }
           }
         } catch (err) {
-          // hvis vi ikke kan hente nåværende tilgjengelighet, bruk ledige
         }
       }
 
@@ -351,12 +320,10 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
       return;
     }
 
-    // If no new availability selected, use the current one (only updating service type)
     let availabilityIdToUse: number;
     if (selectedAvailability) {
       availabilityIdToUse = selectedAvailability.id;
     } else if (appointment?.availabilityId) {
-      // Use current appointment's availability if user only changed service type
       availabilityIdToUse = appointment.availabilityId;
     } else {
       setError(
@@ -365,14 +332,12 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
       return;
     }
 
-    // If new availability selected, require time selection
     if (selectedAvailability && !selectedStartTime) {
       setError("Please select a time when changing the date.");
       return;
     }
 
     try {
-      // Convert time to HH:mm:ss format if provided
       let selectedStartTimeFormatted: string | undefined;
 
       if (selectedStartTime) {
@@ -387,7 +352,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
         selectedServiceType,
         selectedStartTimeFormatted
       );
-      // Reset form
       setSelectedDate(null);
       setSelectedAvailability(null);
       setSelectedStartTime("");
@@ -401,8 +365,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
           "Failed to update appointment. Please try again."
       );
     } finally {
-      // Reset loading state in parent component is handled via loading prop
-      // But we ensure modal state is clean
       setLoadingDates(false);
     }
   };
@@ -447,7 +409,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
             </Alert>
           )}
 
-          {/* Service Type Selection */}
           <div className="service-type-section mb-4">
             <label className="form-label fw-semibold">
               Select Service Type
@@ -503,7 +464,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
             </div>
           </div>
 
-          {/* Date Selection */}
           <div className="mb-4">
             <label className="form-label fw-semibold mb-3">
               Select New Date
@@ -511,11 +471,10 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
             <Form.Select
               value={selectedDate ? formatDateToLocalString(selectedDate) : ""}
               onChange={(e) => {
-                if (e.target.value) {
-                  handleDateSelect(e.target.value);
-                } else {
-                  // Clear selection
-                  setSelectedDate(null);
+              if (e.target.value) {
+                handleDateSelect(e.target.value);
+              } else {
+                setSelectedDate(null);
                   setAvailableWorkersForDate([]);
                   setSelectedAvailability(null);
                   setSelectedStartTime("");
@@ -556,7 +515,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
             )}
           </div>
 
-          {/* Worker Selection - Show when multiple workers available */}
           {selectedDate && availableWorkersForDate.length > 1 && (
             <div className="mb-3">
               <label className="form-label fw-semibold">
@@ -594,7 +552,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
             </div>
           )}
 
-          {/* Show worker name and position when only one worker is available */}
           {selectedDate && availableWorkersForDate.length === 1 && (
             <div className="mb-3">
               <label className="form-label fw-semibold">
@@ -605,7 +562,6 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
             </div>
           )}
 
-          {/* Time Selection */}
           {selectedAvailability && (
             <div className="time-selection-section mb-4">
               <div className="row g-3">

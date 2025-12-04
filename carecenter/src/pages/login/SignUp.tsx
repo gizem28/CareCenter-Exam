@@ -88,14 +88,12 @@ const SignUp: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    // For phone field, only allow digits
     if (name === "phone") {
       const digitsOnly = value.replace(/\D/g, "");
       setFormData((prev) => ({ ...prev, [name]: digitsOnly }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
-    // Clear validation error for this field when user types
     if (validationErrors[name]) {
       setValidationErrors((prev) => {
         const newErrors = { ...prev };
@@ -116,7 +114,6 @@ const SignUp: React.FC = () => {
     setLoading(true);
 
     try {
-      // Sanitize phone number - remove any non-digit characters before sending
       const sanitizedData = {
         fullName: formData.fullName,
         email: formData.email,
@@ -127,7 +124,6 @@ const SignUp: React.FC = () => {
       };
 
       await AuthService.registerPatient(sanitizedData);
-      // Redirect based on context: admin creating patient goes to patients list, regular signup goes to login
       if (isAdminCreating) {
         navigate("/patients");
       } else {

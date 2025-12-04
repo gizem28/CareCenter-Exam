@@ -27,7 +27,6 @@ const ForgotPassword: React.FC = () => {
 
     try {
       const response = await AuthService.forgotPassword(email);
-      // In development, show the token. In production, this would be sent via email
       if (import.meta.env.DEV && response.token) {
         setToken(response.token);
         setStep("reset");
@@ -51,7 +50,6 @@ const ForgotPassword: React.FC = () => {
     setError("");
     setSuccessMessage("");
 
-    // Validate passwords match
     if (newPassword !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -69,7 +67,6 @@ const ForgotPassword: React.FC = () => {
       setSuccessMessage(
         "Password has been reset successfully! Redirecting to login..."
       );
-      // Redirect to appropriate login page based on type
       const loginType = searchParams.get("type") || "patient";
       setTimeout(() => {
         navigate(`/login?type=${loginType}`);

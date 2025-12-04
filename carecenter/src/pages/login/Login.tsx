@@ -1,5 +1,3 @@
-// login side for pasienter og helsearbeidere
-// giriş sayfası - hasta veya sağlık personeli
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
@@ -30,17 +28,14 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState("");
 
-  // sjekk om bruker akkurat registrerte seg
   useEffect(() => {
     const registered = searchParams.get("registered");
     if (registered === "true") {
       setSuccessMessage("Account created successfully! Please log in.");
-      // Clear the query parameter
       navigate("/login?type=patient", { replace: true });
     }
   }, [searchParams, navigate]);
 
-  // oppdater login type basert på url parameter
   useEffect(() => {
     if (typeParam === "patient") {
       setLoginType("patient");
@@ -88,8 +83,7 @@ const Login: React.FC = () => {
   };
 
   const handleEmailChange = (value: string) => {
-    setEmail(value.trim()); // Sanitize: remove whitespace
-    // Clear validation error when user types
+    setEmail(value.trim());
     if (validationErrors.email) {
       setValidationErrors((prev) => {
         const newErrors = { ...prev };
@@ -101,7 +95,6 @@ const Login: React.FC = () => {
 
   const handlePasswordChange = (value: string) => {
     setPassword(value);
-    // Clear validation error when user types
     if (validationErrors.password) {
       setValidationErrors((prev) => {
         const newErrors = { ...prev };
@@ -115,7 +108,7 @@ const Login: React.FC = () => {
     const creds = devCredentials[type];
     setEmail(creds.email);
     setPassword(creds.password);
-    setValidationErrors({}); // Clear any validation errors
+    setValidationErrors({});
     if (type === "admin" || type === "worker") {
       setLoginType("healthcare");
     } else {
@@ -127,7 +120,6 @@ const Login: React.FC = () => {
     e.preventDefault();
     setError("");
 
-    // Validate form before submission
     if (!validateForm()) {
       return;
     }
@@ -137,34 +129,28 @@ const Login: React.FC = () => {
     try {
       await login(email, password);
 
-      // Get user data from localStorage to check role
       const userStr = localStorage.getItem("user");
       if (userStr) {
         const user = JSON.parse(userStr);
 
-        // Validate that user role matches the expected login type
         const isPatientRole = user.role === "Client" || user.role === "Patient";
         const isHealthcareRole =
           user.role === "Admin" || user.role === "Worker";
 
-        // Check if the user is logging in with the correct login type
         if (loginType === "patient" && !isPatientRole) {
-          // Patient login but user is not a patient
           setError(
             "Invalid credentials for patient login. Please use the staff login page, if you are a staff member."
           );
-          logout(); // Clear the invalid login
+          logout();
           return;
         } else if (loginType === "healthcare" && !isHealthcareRole) {
-          // Healthcare login but user is not healthcare personnel
           setError(
             "Invalid credentials for healthcare login. Please use the patient login page."
           );
-          logout(); // Clear the invalid login
+          logout();
           return;
         }
 
-        // Navigate based on role
         if (user.role === "Admin") {
           navigate("/admin/dashboard");
         } else if (user.role === "Worker") {
@@ -172,7 +158,6 @@ const Login: React.FC = () => {
         } else if (user.role === "Client" || user.role === "Patient") {
           navigate("/patient/dashboard");
         } else {
-          // Fallback based on login type
           if (loginType === "healthcare") {
             navigate("/healthcare/dashboard");
           } else {
@@ -291,7 +276,6 @@ const Login: React.FC = () => {
             </a>
           </form>
 
-          {/* Sign up link - only for patient login */}
           {loginType === "patient" && (
             <div className="mt-3">
               <a
@@ -311,7 +295,6 @@ const Login: React.FC = () => {
             </div>
           )}
 
-          {/* Forgot password link - for both patient and healthcare */}
           <div className="mt-3">
             <a
               href="/forgot-password"
@@ -329,7 +312,6 @@ const Login: React.FC = () => {
             </a>
           </div>
 
-          {/* Development Info Section */}
           {import.meta.env.DEV && (
             <div
               style={{

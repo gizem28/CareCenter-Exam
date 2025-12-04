@@ -46,7 +46,6 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
       setDeleteModalOpen(false);
       setSelectedAppointment(null);
     } catch (error) {
-      // Error handling is done in parent component
     } finally {
       setDeletingId(null);
     }
@@ -74,7 +73,6 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
       setUpdateModalOpen(false);
       setSelectedAppointment(null);
     } catch (error) {
-      // Error handling is done in parent component
       throw error;
     } finally {
       setUpdatingId(null);
@@ -112,11 +110,9 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
     }
   };
 
-  // Format time from TimeSpan string (HH:mm:ss) to HH:mm
   const formatTime = (timeString?: string): string => {
     if (!timeString) return "N/A";
     try {
-      // TimeSpan format: "HH:mm:ss" or "HH:mm"
       const parts = timeString.split(":");
       if (parts.length >= 2) {
         return `${parts[0]}:${parts[1]}`;
@@ -131,7 +127,6 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
     return appointment.serviceType || "N/A";
   };
 
-  // Check if appointment can be deleted (not past or same day)
   const canDeleteAppointment = (appointment: AppointmentDTO): boolean => {
     const appointmentDate = appointment.date || appointment.availability?.date;
     if (!appointmentDate) {
@@ -140,10 +135,9 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
 
     const appointmentDateObj = new Date(appointmentDate);
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of day
-    appointmentDateObj.setHours(0, 0, 0, 0); // Reset time to start of day
+    today.setHours(0, 0, 0, 0);
+    appointmentDateObj.setHours(0, 0, 0, 0);
 
-    // Cannot delete if appointment is in the past or same day
     return appointmentDateObj > today;
   };
 
@@ -175,7 +169,6 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
             <tbody>
               {appointments
                 .sort((a, b) => {
-                  // Sort by date first, then by time
                   const dateA = a.date || a.availability?.date || "";
                   const dateB = b.date || b.availability?.date || "";
 
@@ -186,7 +179,6 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
                       return dateCompare;
                     }
 
-                    // If dates are the same, sort by time
                     const timeA =
                       (a as any).selectedStartTime ||
                       (a as any).SelectedStartTime ||
@@ -216,7 +208,6 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
                     </td>
                     <td>
                       {(() => {
-                        // Priority: Use selected start time from appointment, then fall back to availability start time
                         const selectedStartTime =
                           (appointment as any).selectedStartTime ||
                           (appointment as any).SelectedStartTime;
@@ -225,7 +216,6 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
                           return formatTime(selectedStartTime);
                         }
 
-                        // Fallback to availability start time if selected time not available
                         const availability = appointment.availability;
                         const startTime =
                           availability?.startTime ||
@@ -292,7 +282,6 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
         </div>
       )}
 
-      {/* Delete Modal */}
       <DeleteModal
         isOpen={deleteModalOpen}
         onClose={() => {
@@ -304,7 +293,6 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
         loading={deletingId !== null}
       />
 
-      {/* Update Modal */}
       <UpdateAppointmentModal
         isOpen={updateModalOpen}
         onClose={() => {
