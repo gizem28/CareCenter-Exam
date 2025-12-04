@@ -24,8 +24,7 @@ namespace CareCenter.Models
 
         public DateTime RequestedLocalTime { get; set; }
         
-        // Selected time range by the patient
+        // Selected start time by the patient
         public TimeSpan? SelectedStartTime { get; set; }
-        public TimeSpan? SelectedEndTime { get; set; }
     }
 }

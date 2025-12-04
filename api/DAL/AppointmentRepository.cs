@@ -26,23 +26,14 @@ namespace CareCenter.DAL
             if (availability.Appointment != null)
                 throw new InvalidOperationException("This availability is already booked.");
 
-            // Convert string times to TimeSpan if provided
+            // Convert string time to TimeSpan if provided
             TimeSpan? selectedStartTime = null;
-            TimeSpan? selectedEndTime = null;
 
             if (!string.IsNullOrEmpty(dto.SelectedStartTime))
             {
                 if (TimeSpan.TryParse(dto.SelectedStartTime, out var startTime))
                 {
                     selectedStartTime = startTime;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(dto.SelectedEndTime))
-            {
-                if (TimeSpan.TryParse(dto.SelectedEndTime, out var endTime))
-                {
-                    selectedEndTime = endTime;
                 }
             }
 
@@ -55,7 +46,6 @@ namespace CareCenter.DAL
                 CreatedAt = DateTime.UtcNow,
                 RequestedLocalTime = dto.RequestedLocalTime,
                 SelectedStartTime = selectedStartTime,
-                SelectedEndTime = selectedEndTime,
             };
 
             _context.Appointments.Add(appointment);
@@ -107,20 +97,12 @@ namespace CareCenter.DAL
             if (!string.IsNullOrEmpty(dto.ServiceType))
                 appointment.ServiceType = dto.ServiceType;
 
-            // Update selected times if provided
+            // Update selected start time if provided
             if (!string.IsNullOrEmpty(dto.SelectedStartTime))
             {
                 if (TimeSpan.TryParse(dto.SelectedStartTime, out var startTime))
                 {
                     appointment.SelectedStartTime = startTime;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(dto.SelectedEndTime))
-            {
-                if (TimeSpan.TryParse(dto.SelectedEndTime, out var endTime))
-                {
-                    appointment.SelectedEndTime = endTime;
                 }
             }
 

@@ -130,8 +130,7 @@ namespace CareCenter.Controllers
                     Date = a.Availability.Date,
                     WorkerName = a.Availability.HealthcareWorker.FullName,
                     a.PatientId,
-                    SelectedStartTime = FormatTimeSpan(a.SelectedStartTime),
-                    SelectedEndTime = FormatTimeSpan(a.SelectedEndTime)
+                    SelectedStartTime = FormatTimeSpan(a.SelectedStartTime)
                 });
 
                 return Ok(result);
@@ -179,7 +178,6 @@ namespace CareCenter.Controllers
                     WorkerEmail = a.Availability?.HealthcareWorker?.Email ?? "",
                     Date = a.Availability?.Date ?? default(DateTime),
                     SelectedStartTime = FormatTimeSpan(a.SelectedStartTime),
-                    SelectedEndTime = FormatTimeSpan(a.SelectedEndTime),
                     a.CreatedAt,
                     AvailabilityId = a.AvailabilityId,
                     Availability = a.Availability != null ? new

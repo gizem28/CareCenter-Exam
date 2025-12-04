@@ -13,9 +13,8 @@ export interface AppointmentDTO {
   availabilityId?: number;
   // Date of the appointment
   date: string;
-  // Selected time range by the patient
+  // Selected start time by the patient
   selectedStartTime?: string;
-  selectedEndTime?: string;
   // Display-only field (formatted time, added by frontend)
   appointmentTime?: string;
   // Backend model fields
@@ -39,7 +38,6 @@ export interface AppointmentCreateDto {
   serviceType: string;
   requestedLocalTime?: Date | string;
   selectedStartTime?: string; // TimeSpan format "HH:mm:ss" or "HH:mm"
-  selectedEndTime?: string; // TimeSpan format "HH:mm:ss" or "HH:mm"
 }
 
 export interface AppointmentUpdateDto {
@@ -47,7 +45,6 @@ export interface AppointmentUpdateDto {
   status?: string;
   serviceType?: string;
   selectedStartTime?: string;
-  selectedEndTime?: string;
 }
 
 /**

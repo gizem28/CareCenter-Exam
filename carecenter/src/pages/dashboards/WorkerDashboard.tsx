@@ -101,16 +101,10 @@ const WorkerDashboard: React.FC = () => {
     try {
       const data = await appointmentRequests.getByWorker(id);
       const mappedAppointments: AppointmentDTO[] = data.map((item) => {
-        // Format display time from selectedStartTime and selectedEndTime
+        // Format display time from selectedStartTime
         let appointmentTime = "";
         if (item.selectedStartTime) {
-          const start = formatTime(item.selectedStartTime);
-          if (item.selectedEndTime) {
-            const end = formatTime(item.selectedEndTime);
-            appointmentTime = `${start} - ${end}`;
-          } else {
-            appointmentTime = start;
-          }
+          appointmentTime = formatTime(item.selectedStartTime);
         }
 
         return {

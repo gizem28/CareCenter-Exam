@@ -309,7 +309,6 @@ async Task SeedTestUsersAsync(UserManager<AuthUser> userManager, RoleManager<Ide
                 CreatedAt = DateTime.UtcNow,
                 RequestedLocalTime = bookedAvailability.Date, // Set requested time to the availability date
                 SelectedStartTime = new TimeSpan(9, 0, 0),
-                SelectedEndTime = new TimeSpan(10, 0, 0)
             };
             
             dbContext.Appointments.Add(appointment);

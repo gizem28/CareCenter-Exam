@@ -176,9 +176,8 @@ const PatientDashboard: React.FC = () => {
           availabilityId: apt.availabilityId || apt.AvailabilityId,
           date: availabilityDate,
           createdAt: apt.createdAt || apt.CreatedAt,
-          // Include selected times from appointment
+          // Include selected start time from appointment
           selectedStartTime: apt.selectedStartTime || apt.SelectedStartTime,
-          selectedEndTime: apt.selectedEndTime || apt.SelectedEndTime,
           // Include full availability object with normalized field names
           availability: availability
             ? {
@@ -340,7 +339,6 @@ const PatientDashboard: React.FC = () => {
       status?: string;
       serviceType?: string;
       selectedStartTime?: string;
-      selectedEndTime?: string;
     }
   ) => {
     try {
@@ -350,7 +348,6 @@ const PatientDashboard: React.FC = () => {
         status: data.status,
         serviceType: data.serviceType,
         selectedStartTime: data.selectedStartTime,
-        selectedEndTime: data.selectedEndTime,
       };
 
       await appointmentRequests.update(id, updateData);

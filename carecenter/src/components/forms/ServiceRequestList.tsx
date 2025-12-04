@@ -13,7 +13,6 @@ interface ServiceRequestListProps {
       status?: string;
       serviceType?: string;
       selectedStartTime?: string;
-      selectedEndTime?: string;
     }
   ) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
@@ -61,8 +60,7 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
   const handleUpdateConfirm = async (
     availabilityId: number,
     serviceType?: string,
-    selectedStartTime?: string,
-    selectedEndTime?: string
+    selectedStartTime?: string
   ) => {
     if (!selectedAppointment) return;
 
@@ -72,7 +70,6 @@ const ServiceRequestList: React.FC<ServiceRequestListProps> = ({
         availabilityId,
         serviceType: serviceType || undefined,
         selectedStartTime,
-        selectedEndTime,
       });
       setUpdateModalOpen(false);
       setSelectedAppointment(null);

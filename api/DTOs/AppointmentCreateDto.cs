@@ -16,8 +16,7 @@ namespace CareCenter.DTOs
         [Required]
         public string ServiceType { get; set; } = string.Empty;
         
-        // Selected time range by the patient (optional - if not provided, uses availability times)
+        // Selected start time by the patient (optional - if not provided, uses availability start time)
         public string? SelectedStartTime { get; set; }
-        public string? SelectedEndTime { get; set; }
     }
 }

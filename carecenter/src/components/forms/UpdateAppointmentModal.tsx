@@ -13,8 +13,7 @@ interface UpdateAppointmentModalProps {
   onConfirm: (
     availabilityId: number,
     serviceType?: ServiceType,
-    selectedStartTime?: string,
-    selectedEndTime?: string // Keep for backward compatibility but won't be used
+    selectedStartTime?: string
   ) => Promise<void>;
   appointment: AppointmentDTO | null;
   loading?: boolean;
@@ -390,8 +389,7 @@ const UpdateAppointmentModal: React.FC<UpdateAppointmentModalProps> = ({
       await onConfirm(
         availabilityIdToUse,
         selectedServiceType,
-        selectedStartTimeFormatted,
-        undefined // No end time
+        selectedStartTimeFormatted
       );
       // Reset form
       setSelectedDate(null);

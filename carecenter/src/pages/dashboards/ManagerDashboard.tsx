@@ -87,16 +87,10 @@ const ManagerDashboard: React.FC = () => {
       const appointmentsData =
         appointmentsResult.status === "fulfilled"
           ? appointmentsResult.value.map((apt: any) => {
-              // Format display time from selectedStartTime and selectedEndTime
+              // Format display time from selectedStartTime
               let timeDisplay = "N/A";
               if (apt.selectedStartTime) {
-                const formattedStart = formatTimeSpan(apt.selectedStartTime);
-                if (apt.selectedEndTime) {
-                  const formattedEnd = formatTimeSpan(apt.selectedEndTime);
-                  timeDisplay = `${formattedStart} - ${formattedEnd}`;
-                } else {
-                  timeDisplay = formattedStart;
-                }
+                timeDisplay = formatTimeSpan(apt.selectedStartTime);
               }
 
               return {

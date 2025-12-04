@@ -6,6 +6,5 @@ namespace CareCenter.DTOs
         public string? Status { get; set; }
         public string? ServiceType { get; set; }
         public string? SelectedStartTime { get; set; }
-        public string? SelectedEndTime { get; set; }
     }
 }

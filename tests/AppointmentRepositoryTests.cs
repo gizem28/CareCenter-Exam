@@ -75,7 +75,6 @@ public class AppointmentRepositoryTests
             PatientId = patient.Id,
             RequestedLocalTime = DateTime.Today.AddDays(1).AddHours(10),
             SelectedStartTime = "10:00:00",
-            SelectedEndTime = "11:00:00",
             ServiceType = "Medical Care"
         };
 
@@ -90,7 +89,6 @@ public class AppointmentRepositoryTests
         Assert.Equal("Pending", result.Status);
         Assert.Equal("Medical Care", result.ServiceType);
         Assert.Equal(new TimeSpan(10, 0, 0), result.SelectedStartTime);
-        Assert.Equal(new TimeSpan(11, 0, 0), result.SelectedEndTime);
 
         // Verify appointment is linked to availability
         var updatedAvailability = await context.Availabilities
@@ -271,8 +269,7 @@ public class AppointmentRepositoryTests
         {
             Status = "Confirmed",
             ServiceType = "Personal Care",
-            SelectedStartTime = "10:30:00",
-            SelectedEndTime = "11:30:00"
+            SelectedStartTime = "10:30:00"
         };
 
         // Act
@@ -283,7 +280,6 @@ public class AppointmentRepositoryTests
         Assert.Equal("Confirmed", result.Status);
         Assert.Equal("Personal Care", result.ServiceType);
         Assert.Equal(new TimeSpan(10, 30, 0), result.SelectedStartTime);
-        Assert.Equal(new TimeSpan(11, 30, 0), result.SelectedEndTime);
 
         // Verify in database
         var updatedAppointment = await context.Appointments
