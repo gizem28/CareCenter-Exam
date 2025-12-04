@@ -14,10 +14,10 @@ namespace CareCenter.Models
         [DataType(DataType.Date)]
         public DateTime Date { get; set; }
 
-        // Time slots (optional - null means all day available)
+        // Time slots (null means all day available)
         public TimeSpan? StartTime { get; set; }
         public TimeSpan? EndTime { get; set; }
 
-        public Appointment? Appointment { get; set; } // null ise "unbooked"
+        public Appointment? Appointment { get; set; } 
     }
 }

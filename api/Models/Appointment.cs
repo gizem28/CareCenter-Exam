@@ -7,11 +7,11 @@ namespace CareCenter.Models
         public int Id { get; set; }
 
         [Required]
-        public int AvailabilityId { get; set; }  // FK -> Availability
+        public int AvailabilityId { get; set; }  
         public Availability Availability { get; set; } = null!;
 
         [Required]
-        public int PatientId { get; set; }       // FK -> Patient
+        public int PatientId { get; set; }      
         public Patient Patient { get; set; } = null!;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -21,7 +21,7 @@ namespace CareCenter.Models
 
         public string? VisitNote { get; set; }
 
-        public DateTime RequestedLocalTime { get; set; }     // Kullanıcının seçtiği saat
+        public DateTime RequestedLocalTime { get; set; }    
         
         // Selected time range by the patient
         public TimeSpan? SelectedStartTime { get; set; }
@@ -39,6 +39,6 @@ namespace CareCenter.Models
         [Required]
         public string Status { get; set; } = "Pending";
         [Required] public string Description { get; set; } = string.Empty;
-        public bool Done { get; set; } //do we need this? We already have status field
+        public bool Done { get; set; } 
     }
 }

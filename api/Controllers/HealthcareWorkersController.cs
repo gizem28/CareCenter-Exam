@@ -28,7 +28,7 @@ namespace CareCenter.Controllers
             _logger = logger;
         }
 
-        // ✅ GET: api/healthcareworkers
+        //  GET: api/healthcareworkers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<HealthcareWorkerDTO>>> GetAll()
         {
@@ -43,7 +43,7 @@ namespace CareCenter.Controllers
             }
         }
 
-        // ✅ GET: api/healthcareworkers/5
+        //  GET: api/healthcareworkers/5
         [HttpGet("{id:int}")]
         public async Task<ActionResult<HealthcareWorkerDTO>> GetById(int id)
         {
@@ -61,7 +61,7 @@ namespace CareCenter.Controllers
             }
         }
 
-        // ✅ GET: api/healthcareworkers/email/{email}
+        //  GET: api/healthcareworkers/email/{email}
         [HttpGet("email/{email}")]
         public async Task<ActionResult<HealthcareWorkerDTO>> GetByEmail(string email)
         {
@@ -79,7 +79,7 @@ namespace CareCenter.Controllers
             }
         }
 
-        // ✅ POST: api/healthcareworkers
+        //  POST: api/healthcareworkers
         [HttpPost]
         public async Task<ActionResult<HealthcareWorkerDTO>> Create([FromBody] HealthcareWorkerDTO dto)
         {
@@ -90,10 +90,10 @@ namespace CareCenter.Controllers
             {
                 string? password = null;
                 
-                // If UserId is not provided, create AuthUser first
+              
                 if (string.IsNullOrEmpty(dto.UserId))
                 {
-                    // Check if AuthUser already exists with this email
+                   
                     var existingUser = await _userManager.FindByEmailAsync(dto.Email);
                     if (existingUser != null)
                     {
@@ -101,7 +101,7 @@ namespace CareCenter.Controllers
                         return Conflict(new { message = "A user with this email already exists" });
                     }
 
-                    // Create new AuthUser for the healthcare worker
+                    
                     if (!await _roleManager.RoleExistsAsync("Worker"))
                         await _roleManager.CreateAsync(new IdentityRole("Worker"));
 
@@ -111,17 +111,17 @@ namespace CareCenter.Controllers
                         Email = dto.Email,
                         FullName = dto.FullName,
                         Role = "Worker",
-                        EmailConfirmed = true // Email should not be confirmed by default. To do: Add a confirmation email.
+                        EmailConfirmed = true 
                     };
 
-                    // Use provided password or generate a secure random one
+               
                     if (!string.IsNullOrWhiteSpace(dto.Password) && dto.Password.Length >= 6)
                     {
                         password = dto.Password;
                     }
                     else
                     {
-                        // Give error if password is not provided or invalid
+                   
                         return BadRequest(new { message = "Password is required and must be at least 6 characters" });
                     }
                     
@@ -171,7 +171,7 @@ namespace CareCenter.Controllers
             }
         }
 
-        // ✅ PUT: api/healthcareworkers/5
+        //  PUT: api/healthcareworkers/5
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] HealthcareWorkerDTO dto)
         {
@@ -199,7 +199,7 @@ namespace CareCenter.Controllers
             }
         }
 
-        // ✅ DELETE: api/healthcareworkers/5
+        //  DELETE: api/healthcareworkers/5
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
