@@ -623,8 +623,10 @@ const WorkerDashboard: React.FC = () => {
             ) : viewMode === "calendar" ? (
               <UnifiedCalendar
                 availabilities={availabilities}
+                appointments={appointments}
                 onDateClick={handleCalendarDateClick}
                 showBooked={true}
+                showApproved={true}
                 dotSize={6}
               />
             ) : (

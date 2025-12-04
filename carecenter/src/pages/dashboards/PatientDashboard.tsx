@@ -6,6 +6,7 @@ import {
   appointmentRequests,
   type AppointmentDTO,
   type AppointmentCreateDto,
+  type AppointmentUpdateDto,
 } from "../../api/appointments";
 import { patientRequests } from "../../api/patients";
 import PatientCalendarForm, {
@@ -378,9 +379,7 @@ const PatientDashboard: React.FC = () => {
 
       // Get the appointment date
       const appointmentDate =
-        appointment.date ||
-        appointment.appointmentDate ||
-        appointment.availability?.date;
+        appointment.date || appointment.availability?.date;
       if (!appointmentDate) {
         setError("Cannot determine appointment date.");
         return;

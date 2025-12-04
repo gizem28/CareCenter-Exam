@@ -77,10 +77,10 @@ const UnifiedCalendar: React.FC<UnifiedCalendarProps> = ({
         // Check for approved appointments (priority)
         if (showApproved && appointments.length > 0) {
           const hasApprovedAppointment = appointments.some((apt) => {
-            const aptDate =
-              apt.date || apt.appointmentDate || apt.availability?.date;
+            const aptDate = apt.date || apt.availability?.date;
             if (!aptDate) return false;
-            const aptDateStr = new Date(aptDate).toISOString().split("T")[0];
+            // Use split to avoid timezone conversion issues
+            const aptDateStr = String(aptDate).split("T")[0];
             return aptDateStr === dateStr;
           });
           if (hasApprovedAppointment) {
@@ -137,10 +137,10 @@ const UnifiedCalendar: React.FC<UnifiedCalendarProps> = ({
         // Check for approved appointments (priority)
         if (showApproved && appointments.length > 0) {
           const hasApprovedAppointment = appointments.some((apt) => {
-            const aptDate =
-              apt.date || apt.appointmentDate || apt.availability?.date;
+            const aptDate = apt.date || apt.availability?.date;
             if (!aptDate) return false;
-            const aptDateStr = new Date(aptDate).toISOString().split("T")[0];
+            // Use split to avoid timezone conversion issues
+            const aptDateStr = String(aptDate).split("T")[0];
             return aptDateStr === dateStr;
           });
           if (hasApprovedAppointment) {

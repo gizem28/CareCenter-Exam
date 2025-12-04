@@ -175,6 +175,24 @@ const ManagerDashboard: React.FC = () => {
     }
   };
 
+  const handleApproveAppointment = async (id: number) => {
+    try {
+      await appointmentRequests.approve(id);
+      await loadDashboard();
+    } catch (err: any) {
+      setError(err.message || "Failed to approve appointment");
+    }
+  };
+
+  const handleRejectAppointment = async (id: number) => {
+    try {
+      await appointmentRequests.reject(id);
+      await loadDashboard();
+    } catch (err: any) {
+      setError(err.message || "Failed to reject appointment");
+    }
+  };
+
   if (loading && !dashboard) {
     return (
       <div className="container mt-4">
@@ -271,6 +289,8 @@ const ManagerDashboard: React.FC = () => {
             <AppointmentTable
               appointments={dashboard.appointments}
               onView={handleViewAppointment}
+              onApprove={handleApproveAppointment}
+              onReject={handleRejectAppointment}
               formatDate={formatDate}
               getServiceType={getServiceType}
             />

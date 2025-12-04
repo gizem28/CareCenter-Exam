@@ -24,7 +24,7 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
             <div className="d-grid gap-2 mt-auto">
               <a
                 href="/patients"
-                className="btn btn-outline-secondary"
+                className="btn btn-outline-success"
                 onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
                   e.preventDefault();
                   navigate("/patients");
@@ -79,19 +79,9 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
               <small className="text-muted">Total Appointments</small>
             </div>
             <div className="d-grid gap-2 mt-auto">
-              <a
-                href="/admin/service-requests"
-                className="btn btn-outline-primary btn-sm"
-                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-                  e.preventDefault();
-                  navigate("/admin/service-requests");
-                }}
-              >
-                <i className="bi bi-clipboard-check"></i> Approve Requests
-              </a>
               <button
                 type="button"
-                className="btn btn-outline-info btn-sm"
+                className="btn btn-outline-success"
                 onClick={() => {
                   const element = document.getElementById(
                     "appointments-section"
